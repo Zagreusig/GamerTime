@@ -35,7 +35,11 @@ Enemy* BossClass(int id) {
 	return boss;
 }
 
-Enemy* EliteClass(int id) {
+Enemy* EliteClass() {
+	// FIXME: DELETE
+	srand(3);
+	int id = rand() % 3;
+
 	Enemy* elite = (Enemy*)malloc(sizeof(Enemy));
 	if (elite == NULL) {
 		printf("Malloc err, EliteClass()\n");
@@ -70,17 +74,63 @@ Enemy* CommonClass() {
 
 }
 
-Enemy* GetEnemy(Difficulty* modifier) {
+Enemy* SecretSecret() {
+	Enemy* secrets;
+	secrets->MAX_HP = 1000;
+	secrets->MAX_DMG = 9999;
+	secrets->RARITY = 100;
+	
+}
+
+Enemy* GetEnemyMulti(Difficulty* modifier) {
 	Enemy it;
 
-	int type;
-	double likelihood = (double)(rand()) / modifier->evilfactor;
-	int enemyAmount = GetAmount(modifier);
+	double chance = (double)(rand()) * modifier->evilfactor;
+	int type = GetType(modifier, chance);
+	int enemyAmount = GetAmount(chance);
 	if (enemyAmount == 1) {
 		enemyAmount++;
 	}
+
+	switch (type)
+	{
+	default:
+		break;
+	case 0:
+		CommonClass();
+	case 1:
+		EliteClass();
+	case 3:
+		SecretSecret();
+	}
 }
 
-int GetAmount(Difficulty* modifier) {
-	return (int)(rand(modifier->evilfactor) % 4) + 1;
+Enemy* GetEnemySingle(Difficulty* modifier) {
+	Enemy it;
+
+	double chance = (double)(rand()) * modifier->evilfactor;
+	int type = GetType(modifier, chance);
+
+
+}
+
+int GetAmount(double chance) {
+	return (int)(rand(chance) % 4) + 1;
+}
+
+int GetType(Difficulty* modifier, double chance) {
+	int type;
+	switch (modifier->code)
+	{
+	default:
+		break;
+	case 0:
+		// lower chance of elite enemy
+	case 1:
+		// normal chance
+	case 2:
+		// slightly higher chance
+	case 3:
+	}	// very high chance
+
 }

@@ -18,6 +18,7 @@ typedef struct Entity_struct {
 	int health;
 	int damage;
 	int id;
+	int persuation;
 
 	char interact;
 
