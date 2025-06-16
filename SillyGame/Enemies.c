@@ -108,29 +108,60 @@ Enemy* GetEnemyMulti(Difficulty* modifier) {
 Enemy* GetEnemySingle(Difficulty* modifier) {
 	Enemy it;
 
-	double chance = (double)(rand()) * modifier->evilfactor;
-	int type = GetType(modifier, chance);
+	double chance = (double)(rand() % 10) * modifier->evilfactor;
+	int type = GetType(modifier);
 
 
 }
 
-int GetAmount(double chance) {
-	return (int)(rand(chance) % 4) + 1;
+double GetEnemyChance(Difficulty* modifier) {
+	double chance;
+	chance = (double)(rand() % 10) * modifier->evilfactor;
+	return chance;
 }
 
-int GetType(Difficulty* modifier, double chance) {
+double GetFunnyChance(Difficulty* modifier) {
+	double chance;
+	chance = (double)(rand() % 99999) * modifier->sillyfactor;
+	return chance;
+}
+
+double GetDblRNG(double chance, int outof, int plus) {
+	return (double)(rand(chance) % outof) + plus;
+}
+
+int GetIntRNG(double chance, int outof, int plus) {
+	return (int)(rand(chance) % outof) + plus;
+}
+
+int GetType(Difficulty* modifier) {
 	int type;
+	double chance;
+	double funnyChance;
 	switch (modifier->code)
 	{
 	default:
+		printf("GetType() err. \n");
 		break;
 	case 0:
+		chance = GetEnemyChance(modifier);
+		funnyChance = GetFunnyChance(modifier);
+		type = GetIntRNG(chance, 4, 0);
 		// lower chance of elite enemy
 	case 1:
+		chance = GetEnemyChance(modifier);
+		funnyChance = GetFunnyChance(modifier);
+		type = GetIntRNG(chance, 4, 0);
 		// normal chance
 	case 2:
+		chance = GetEnemyChance(modifier);
+		funnyChance = GetFunnyChance(modifier);
+		type = GetIntRNG(chance, 4, 0);
 		// slightly higher chance
 	case 3:
+		chance = GetEnemyChance(modifier);
+		funnyChance = GetFunnyChance(modifier);
+		type = GetIntRNG(chance, 4, 0);
 	}	// very high chance
 
 }
