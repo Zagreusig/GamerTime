@@ -5,16 +5,16 @@ There can be "trick" items that appear *almost* normal, but are jester items tha
 Example:
 NORMAL
     AMAZING ITEM!
-    ~Flavor text~
+    "Flavor text"
       Stat 1
       Stat 2
     
-  ~Flavor text~
+  "Flavor text"
 
 JESTER
   AMAZEING IITEM!
-  ~Flavor text~
+  "Flavor text"
     Stat 1
     Stat 2
 
-  ~Flavor text~
+  "Flavor text"
