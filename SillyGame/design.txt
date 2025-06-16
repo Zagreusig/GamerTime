@@ -1,0 +1,8 @@
+Silly text game!
+
+IDEAS:
+Choose your own adventure
+	- some paths require certain items that you pick up
+	- inventory system
+	- random "trick" items with negative effects disgused as a positive item
+	
