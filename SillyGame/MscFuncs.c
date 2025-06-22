@@ -34,14 +34,11 @@ void DebugDifficultyConfig(const Difficulty* config) {
     if (config->code == 3) {
         printf("Mode: Ultrahard");
     }
-    printf("\nEHP Multiplier: %0.2lf", config->enemyHP);
-    printf("\nEDMG Multiplier: %0.2lf", config->enemyDMG);
-    printf("\nPlayer DMG Multiplier: %0.2lf", config->playerDMG);
-    printf("\nItem durr multiplier: %0.2lf", config->itemsHP);
-    printf("\nShop price multiplier: %0.2lf", config->shopPrice);
-    printf("\nHealing effectiveness: %0.2lf", config->healingAMT);
-    printf("\nNegative effect linger: %0.2lf", config->negativeStatus);
-    printf("\nFake Item chance: %0.2lf", config->jokerChance);
+    
+    printf("\"Evil factor\": %0.2lf\n", config->evilfactor);
+    printf("\"Silly Factor\": %0.2lf", config->sillyfactor);
+    printf("\"Player factor\": %0.2lf\n", config->playerfactor);
+    printf("\"Likeability\": %0.2lf\n", config->likeability);
 }
 
 //void ClearInputBuffer() {

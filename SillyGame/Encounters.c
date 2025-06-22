@@ -37,7 +37,7 @@ void RegularCombatEncounter(Difficulty* modifier) {
 	Enemy* Enemies[5];
 	int enemyTypes[5];
 	double likelihood = (double)(rand()) / modifier->evilfactor;
-	int enemyAmount = (int)(rand(modifier->evilfactor) % 4) + 1;
+	int enemyAmount = (int)(rand() * modifier->evilfactor) % 4 + 1;
 	if (enemyAmount == 1) {
 		enemyAmount++;
 	}

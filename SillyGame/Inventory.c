@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-
+/*
 bool HasItem() {
 
 }
@@ -21,3 +21,4 @@ void PrintItemInfo() {
 void PrintInventory() {
 
 }
+*/

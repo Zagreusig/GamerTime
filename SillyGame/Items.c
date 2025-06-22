@@ -5,6 +5,72 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct Table_Struct {
+    Item* itemOne;
+    Item* itemTwo;
+    Item* itemThree;
+}Table;
+
+
+Item LootDrop(int stageID, int rarity) {
+    Item tbd = (Item*)malloc(sizeof(Item));
+    Table FirstStage = (Table*)malloc(sizeof(Table));
+    Table SecondStage = (Table*)malloc(sizeof(Table));
+    Table ThirdStage = (Table*)malloc(sizeof(Table));
+    if (tbd == NULL || FirstStage == NULL || SecondStage == NULL || ThirdStage == NULL) {
+        printf("\nMalloc err LootDrop()\n");
+        exit(1);
+    }
+
+    switch (stageID)
+    {
+    default:
+        break;
+    case 0:
+        switch (rarity)
+        {
+        default:
+            printf("\nRarity in LootDrop() err\n");
+            break;
+        case 0:
+            tbd = GetRare1();
+        case 1:
+
+        case 2:
+
+        }
+    case 1:
+        switch (rarity)
+        {
+        default:
+            printf("\nRarity in LootDrop() err\n");
+            break;
+        case 0:
+
+        case 1:
+
+        case 2:
+
+        }
+    case 2:
+
+        switch (rarity)
+        {
+        default:
+            printf("\nRarity in LootDrop() err\n");
+            break;
+        case 0:
+
+        case 1:
+
+        case 2:
+
+        }
+    }
+   
+
+}
+
 Item DullBlade() {
 	Item dullBlade;
 	dullBlade.id = 0;

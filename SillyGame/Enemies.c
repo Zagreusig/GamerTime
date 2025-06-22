@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,19 +73,54 @@ Enemy* EliteClass() {
 }
 
 Enemy* CommonClass() {
-
+	int id = rand() % 3;
+	Enemy* enemy = (Enemy*)malloc(sizeof(Enemy));
+	if (enemy == NULL) {
+		printf("Malloc err, CommonClass()\n");
+		exit(1);
+	}
+	switch (id)
+	{
+	default:
+		break;
+	case 0:
+		strcpy(enemy->name, "Common enemy 1");
+		enemy->MAX_DMG = 4;
+		enemy->MAX_HP = 10;
+		enemy->RARITY = 1;
+	case 1:
+		strcpy(enemy->name, "Common enemy 2");
+		enemy->MAX_DMG = 3;
+		enemy->MAX_HP = 9;
+		enemy->RARITY = 2;
+	case 2:
+		strcpy(enemy->name, "Common enemy 3");
+		enemy->MAX_DMG = 4;
+		enemy->MAX_HP = 13;
+		enemy->RARITY = 0;
+	}
+	return enemy;
 }
 
 Enemy* SecretSecret() {
-	Enemy* secrets;
+	Enemy* secrets = (Enemy*)malloc(sizeof(Enemy));
+	if (secrets == NULL) {
+		printf("Malloc err, SecretSecret()\n");
+		exit(1);
+	}
+	strcpy(secrets->name, "Secret secrets");
 	secrets->MAX_HP = 1000;
 	secrets->MAX_DMG = 9999;
 	secrets->RARITY = 100;
-	
+	return secrets;
 }
 
 Enemy* GetEnemyMulti(Difficulty* modifier) {
-	Enemy it;
+	Enemy it = (Enemy*)malloc(sizeof(Enemy));
+	if (it == NULL) {
+		printf("Malloc err, GetEnemyMulti()\n");
+		exit(1);
+	}
 
 	double chance = (double)(rand()) * modifier->evilfactor;
 	int type = GetType(modifier, chance);
@@ -105,14 +142,14 @@ Enemy* GetEnemyMulti(Difficulty* modifier) {
 	}
 }
 
-Enemy* GetEnemySingle(Difficulty* modifier) {
-	Enemy it;
-
-	double chance = (double)(rand() % 10) * modifier->evilfactor;
-	int type = GetType(modifier);
-
-
-}
+//Enemy* GetEnemySingle(Difficulty* modifier) {
+//	Enemy it;
+//
+//	double chance = (double)(rand() % 10) * modifier->evilfactor;
+//	int type = GetType(modifier);
+//
+//
+//}
 
 double GetEnemyChance(Difficulty* modifier) {
 	double chance;
@@ -127,41 +164,31 @@ double GetFunnyChance(Difficulty* modifier) {
 }
 
 double GetDblRNG(double chance, int outof, int plus) {
-	return (double)(rand(chance) % outof) + plus;
+	return (double)(rand() * chance % outof) + plus;
 }
 
 int GetIntRNG(double chance, int outof, int plus) {
-	return (int)(rand(chance) % outof) + plus;
+	return (int)(rand() * chance % outof) + plus;
 }
 
 int GetType(Difficulty* modifier) {
 	int type;
-	double chance;
-	double funnyChance;
-	switch (modifier->code)
-	{
-	default:
-		printf("GetType() err. \n");
-		break;
-	case 0:
-		chance = GetEnemyChance(modifier);
-		funnyChance = GetFunnyChance(modifier);
+	double chance = GetEnemyChance(modifier);
+	double funnyChance = GetFunnyChance(modifier);
+	
+	if (funnyChance == 1924) {
+		return 999;
+	}
+	else {
 		type = GetIntRNG(chance, 4, 0);
-		// lower chance of elite enemy
-	case 1:
-		chance = GetEnemyChance(modifier);
-		funnyChance = GetFunnyChance(modifier);
-		type = GetIntRNG(chance, 4, 0);
-		// normal chance
-	case 2:
-		chance = GetEnemyChance(modifier);
-		funnyChance = GetFunnyChance(modifier);
-		type = GetIntRNG(chance, 4, 0);
-		// slightly higher chance
-	case 3:
-		chance = GetEnemyChance(modifier);
-		funnyChance = GetFunnyChance(modifier);
-		type = GetIntRNG(chance, 4, 0);
-	}	// very high chance
+		return type;
+	}
+
+	// ez: lower chance of elite enemy
+	// norm: normal chance
+	// hrd: slightly higher chance
+	// ultra: very high chance
+
+
 
 }

@@ -11,12 +11,14 @@
 * Shop prices reduced, increased healing effectiveness, reduced negative status time, decreased prank item chance.
 */ 
 
-Difficulty* DifficultySet(int difficulty) {
+Difficulty* DifficultySet() { // int difficulty
 	Difficulty* diffSettngs = (Difficulty*)malloc(sizeof(Difficulty));
 	if (diffSettngs == NULL) {
 		return NULL;
 	}
-	
+
+	// FIXME: DELETE (testing)
+	int difficulty = 0;
 
 	if (difficulty == 0) {
 		diffSettngs->code = 0;
