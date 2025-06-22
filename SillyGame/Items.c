@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct Table_Struct {
     Item* itemOne;
@@ -11,12 +12,34 @@ typedef struct Table_Struct {
     Item* itemThree;
 }Table;
 
+Item GetRare1() {
+    int rng;
+    Item validItem;
+    Item errItem;
+    // FIXME: Finish this
+    rng = rand() % 4;
 
-Item LootDrop(int stageID, int rarity) {
-    Item tbd = (Item*)malloc(sizeof(Item));
-    Table FirstStage = (Table*)malloc(sizeof(Table));
-    Table SecondStage = (Table*)malloc(sizeof(Table));
-    Table ThirdStage = (Table*)malloc(sizeof(Table));
+    if (rng == 0) {
+        return validItem = DullBlade();
+    }
+    else if (rng == 1) {
+        return validItem = SharpSword();
+    }
+    else if (rng == 2) {
+        return validItem = HerosSword();
+    }
+    else {
+        errItem.id = -1;
+        return errItem;
+    }
+
+}
+
+Item* LootDrop(int stageID, int rarity) {
+    Item* tbd = (Item*)malloc(sizeof(Item));
+    Table* FirstStage = (Table*)malloc(sizeof(Table));
+    Table* SecondStage = (Table*)malloc(sizeof(Table));
+    Table* ThirdStage = (Table*)malloc(sizeof(Table));
     if (tbd == NULL || FirstStage == NULL || SecondStage == NULL || ThirdStage == NULL) {
         printf("\nMalloc err LootDrop()\n");
         exit(1);
@@ -33,7 +56,11 @@ Item LootDrop(int stageID, int rarity) {
             printf("\nRarity in LootDrop() err\n");
             break;
         case 0:
-            tbd = GetRare1();
+            *tbd = GetRare1();
+            if (tbd->id == -1) {
+                printf("GetRare1() err\n");
+                exit(1);
+            }
         case 1:
 
         case 2:

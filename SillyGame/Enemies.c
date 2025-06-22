@@ -116,7 +116,7 @@ Enemy* SecretSecret() {
 }
 
 Enemy* GetEnemyMulti(Difficulty* modifier) {
-	Enemy it = (Enemy*)malloc(sizeof(Enemy));
+	Enemy* it = (Enemy*)malloc(sizeof(Enemy));
 	if (it == NULL) {
 		printf("Malloc err, GetEnemyMulti()\n");
 		exit(1);
@@ -164,7 +164,7 @@ double GetFunnyChance(Difficulty* modifier) {
 }
 
 double GetDblRNG(double chance, int outof, int plus) {
-	return (double)(rand() * chance % outof) + plus;
+	return (double)(rand() * chance) + plus;
 }
 
 int GetIntRNG(double chance, int outof, int plus) {
