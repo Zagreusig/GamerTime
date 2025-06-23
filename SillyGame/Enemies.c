@@ -124,7 +124,7 @@ Enemy* GetEnemyMulti(Difficulty* modifier) {
 
 	double chance = (double)(rand()) * modifier->evilfactor;
 	int type = GetType(modifier, chance);
-	int enemyAmount = GetAmount(chance);
+	int enemyAmount = GetAmount(modifier);
 	if (enemyAmount == 1) {
 		enemyAmount++;
 	}
@@ -168,7 +168,7 @@ double GetDblRNG(double chance, int outof, int plus) {
 }
 
 int GetIntRNG(double chance, int outof, int plus) {
-	return (int)(rand() * chance % outof) + plus;
+	return (rand() % outof) * (int)chance + plus;
 }
 
 int GetType(Difficulty* modifier) {
@@ -183,12 +183,10 @@ int GetType(Difficulty* modifier) {
 		type = GetIntRNG(chance, 4, 0);
 		return type;
 	}
-
 	// ez: lower chance of elite enemy
 	// norm: normal chance
 	// hrd: slightly higher chance
 	// ultra: very high chance
-
-
-
 }
+
+int GetAmount(Difficulty* config) { return 3; }

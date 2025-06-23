@@ -14,12 +14,12 @@
 #include "MscFuncs.h"
 
 int main(void) {
-    Difficulty* diff = malloc(sizeof(Difficulty));
-    Item item;
+    Difficulty* diff = (Difficulty*)malloc(sizeof(Difficulty));
+    Item* item = (Item*)malloc(sizeof(Item));
 
     for (int i = 0; i < 3; i++) {
         item = ItemIDsMaster(i);
-        DebugItem(&item);
+        DebugItem(item);
     }
 
     diff = DifficultySet();

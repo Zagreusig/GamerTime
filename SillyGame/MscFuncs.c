@@ -13,12 +13,12 @@ void ErrFunc() {
 	WipeMem();
 }
 
-void DebugItem(const Item* item) {
-    printf("ID: %d\n", item->id);
-    printf("Name: %s\n", item->name);
-    printf("Description: %s\n", item->description);
-    printf("Durrability: %d\n", item->hp);
-    printf("Damage: %d\n\n", item->dmg);
+void DebugItem(Item* passed) {
+    printf("Item Name: %s\n", passed->name);
+    printf("Item Description: %s\n", passed->description);
+    printf("Item ID: %d\n", passed->id);
+    printf("Item HP: %d\n", passed->hp);
+    printf("Item DMG: %d\n", passed->dmg);
 }
 
 void DebugDifficultyConfig(const Difficulty* config) {

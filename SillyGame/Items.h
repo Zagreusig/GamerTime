@@ -10,7 +10,10 @@ typedef struct Item_struct {
 	int dmg;
 }Item;
 
-Item DullBlade();
-Item ItemIDsMaster(int code);
+Item* ItemIDsMaster(int code);
+Item* DullBlade(Item* passed);
+Item* SharpSword(Item* passed);
+Item* HerosSword(Item* passed);
+
 
 #endif
