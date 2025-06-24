@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DebugThings.c" />
     <ClCompile Include="DifficultyConfig.c" />
     <ClCompile Include="Encounters.c" />
     <ClCompile Include="Enemies.c" />
@@ -136,15 +137,21 @@
     <ClCompile Include="Menus.c" />
     <ClCompile Include="MscFuncs.c" />
     <ClCompile Include="Entity.c" />
+    <ClCompile Include="OnStart.c" />
     <ClCompile Include="Scenes.c" />
+    <ClCompile Include="Stages.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="DifficultyConfig.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="Items.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="MscFuncs.h" />
+    <ClInclude Include="OnStart.h" />
+    <ClInclude Include="Stages.h" />
+    <ClInclude Include="StructDefinitions.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="design.txt" />

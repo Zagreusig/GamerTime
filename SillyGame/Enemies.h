@@ -1,18 +1,12 @@
 #pragma once
 #ifndef ENEMIES_H
 #define ENEMIES_H
+#include "StructDefinitions.h"
 
-typedef struct Enemy_struct {
-	char* name[50];
-	
-	int MAX_HP;
-	int MAX_DMG;
-	int RARITY;
-	
-	int currhp;
-	int dmg;
-
-
-}Enemy;
+Enemy* BossClass(int id);
+Enemy* EliteClass(int id);
+Enemy* CommonClass(int id);
+Enemy* SecretSecret();
+Enemy* GetEnemyMulti(Difficulty* modifier);
 
 #endif

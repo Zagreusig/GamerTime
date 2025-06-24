@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
+#include "StructDefinitions.h"
 #include "DifficultyConfig.h"
 #include "Entity.h"
 #include "Enemies.h"

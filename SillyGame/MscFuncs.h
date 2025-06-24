@@ -1,11 +1,9 @@
 #pragma once
 #ifndef MSC_FUNCS_H
 #define MSC_FUNCS_H
-#include "Items.h"
-#include "DifficultyConfig.h"
-#include "Entity.h"
+#include "StructDefinitions.h"
 
-void DebugItem(const Item* item);
-void DebugDifficultyConfig(const Difficulty* config);
+void DebugItem(Item* item);
+void DebugDifficultyConfig(Difficulty* config);
 
 #endif

@@ -7,28 +7,43 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
+#include "Stages.h"
+#include "StructDefinitions.h"
 #include "Entity.h"
 #include "Inventory.h"
 #include "Items.h"
 #include "DifficultyConfig.h"
+#include "Debug.h"
 #include "MscFuncs.h"
+#include "OnStart.h"
 
 int main(void) {
-    Difficulty* diff = (Difficulty*)malloc(sizeof(Difficulty));
-    Item* item = (Item*)malloc(sizeof(Item));
+    Difficulty* config = (Difficulty*)malloc(sizeof(Difficulty));
+    Stage* stages[3] = { (Stage*)calloc(1, (3 * sizeof(Stage))) };
+    char yesNoChoice;
 
     for (int i = 0; i < 3; i++) {
-        item = ItemIDsMaster(i);
-        DebugItem(item);
+        stages[i] = StageInfoReference(i);
     }
+    
 
-    diff = DifficultySet();
-    if (diff == NULL) {
-        printf("Malloc err.\n");
-        return 1;
+    
+    printf("Would you like to preset a difficulty?\n");
+    printf("(y / n): ");
+    while (scanf("%c", &yesNoChoice) != 1) {
+        printf("Not a valid character.");
     }
+    if (yesNoChoice == 'y' || yesNoChoice == 'Y') {
+        int i;
+        printf("Select difficulty code: ");
+        (void)scanf("%d", &i);
+        config = DifficultySet(i);
+    }
+    else {
+        printf("\nDifficulty will not be initialized.\n\n"); 
+    }
+    DebugMenus(config);
 
-    DebugDifficultyConfig(diff);
 
     return 0;
 }

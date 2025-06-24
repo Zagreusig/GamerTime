@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "StructDefinitions.h"
 #include "Entity.h"
 #include "Enemies.h"
 #include "DifficultyConfig.h"
@@ -35,13 +36,10 @@ Enemy* BossClass(int id) {
 		boss->RARITY = 100;
 	}
 	return boss;
+	free(boss);
 }
 
-Enemy* EliteClass() {
-	// FIXME: DELETE
-	srand(3);
-	int id = rand() % 3;
-
+Enemy* EliteClass(int id) {
 	Enemy* elite = (Enemy*)malloc(sizeof(Enemy));
 	if (elite == NULL) {
 		printf("Malloc err, EliteClass()\n");
@@ -51,7 +49,7 @@ Enemy* EliteClass() {
 	switch (id)
 	{
 	default:
-		printf("Boss func err\n");
+		return NULL;
 		break;
 	case 0:
 		strcpy(elite->name, "Elite enemy 1");
@@ -70,10 +68,10 @@ Enemy* EliteClass() {
 		elite->RARITY = 4;
 	}
 	return elite;
+	free(elite);
 }
 
-Enemy* CommonClass() {
-	int id = rand() % 3;
+Enemy* CommonClass(int id) {
 	Enemy* enemy = (Enemy*)malloc(sizeof(Enemy));
 	if (enemy == NULL) {
 		printf("Malloc err, CommonClass()\n");
@@ -82,6 +80,7 @@ Enemy* CommonClass() {
 	switch (id)
 	{
 	default:
+		return NULL;
 		break;
 	case 0:
 		strcpy(enemy->name, "Common enemy 1");
@@ -100,6 +99,7 @@ Enemy* CommonClass() {
 		enemy->RARITY = 0;
 	}
 	return enemy;
+	free(enemy);
 }
 
 Enemy* SecretSecret() {
@@ -113,43 +113,87 @@ Enemy* SecretSecret() {
 	secrets->MAX_DMG = 9999;
 	secrets->RARITY = 100;
 	return secrets;
+	free(secrets);
 }
 
 Enemy* GetEnemyMulti(Difficulty* modifier) {
-	Enemy* it = (Enemy*)malloc(sizeof(Enemy));
+	Enemy* it[5] = { (Enemy*)malloc(5 * sizeof(Enemy)) };
+	Enemy* s = (Enemy*)malloc(sizeof(Enemy));
 	if (it == NULL) {
 		printf("Malloc err, GetEnemyMulti()\n");
 		exit(1);
 	}
 
 	double chance = (double)(rand()) * modifier->evilfactor;
-	int type = GetType(modifier, chance);
+	int type;
+	int j = 0;
+	int has_elite_flag = 0;
+	// FIXME: Create funct for harder difficulty = increased number of elites.
 	int enemyAmount = GetAmount(modifier);
 	if (enemyAmount == 1) {
 		enemyAmount++;
 	}
+	int enemyID;
+	goto build_loop;
+
+
+	build_loop:
+	for (int i = 0; i < enemyAmount; i++) {
+		enemyID = rand() % 4;
+		type = GetType(modifier, chance);
+		if (type == 1 && has_elite_flag == 1) {
+			type = 0;
+		}
+		goto enemy_determine;
+	}
+	
+	enemy_determine:
+	switch (type)
+	{
+	default:
+		return NULL;
+		break;
+	case 0:
+		it[j] = CommonClass(enemyID);
+		j++;
+		goto build_loop;
+	case 1:
+		it[j] = EliteClass(enemyID);
+		has_elite_flag = 1;
+		j++;
+		goto build_loop;
+	case 999:
+		s = SecretSecret();
+		return s;
+		break;
+	}
+
+	free(s);
+	free(it);
+}
+
+Enemy* GetEnemySingle(Difficulty* modifier) {
+	Enemy* it = (Enemy*)malloc(sizeof(Enemy));
+
+	double chance = (double)(rand() % 10) * modifier->evilfactor;
+	int type = GetType(modifier);
+	int id = rand() % 4;
 
 	switch (type)
 	{
 	default:
+		return NULL;
 		break;
 	case 0:
-		CommonClass();
+		it = CommonClass(id);
 	case 1:
-		EliteClass();
-	case 3:
-		SecretSecret();
+		it = EliteClass(id);
+	case 999:
+		it = SecretSecret();
 	}
+	return it;
+	free(it);
 }
-
-//Enemy* GetEnemySingle(Difficulty* modifier) {
-//	Enemy it;
-//
-//	double chance = (double)(rand() % 10) * modifier->evilfactor;
-//	int type = GetType(modifier);
-//
-//
-//}
 
 double GetEnemyChance(Difficulty* modifier) {
 	double chance;

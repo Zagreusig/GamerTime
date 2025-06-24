@@ -45,6 +45,15 @@
     <ClCompile Include="Enemies.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DebugThings.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OnStart.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Stages.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inventory.h">
@@ -63,6 +72,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Enemies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OnStart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Stages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StructDefinitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
