@@ -79,6 +79,8 @@ Item* HerosSword(Item* herosSword){
     return herosSword;
 }
 
+// FIXME: Make this into an Item Table type function.
+//        should build a table containing all items and return.
 Item* ItemIDsMaster(int code) {
     Item* call = (Item*)malloc(sizeof(Item));
     if (code == 0) {
@@ -94,4 +96,10 @@ Item* ItemIDsMaster(int code) {
         return call;
     }
     return NULL;
+}
+
+Item* ItemReference(ITable* MasterList, int idcode) {
+
+    // FIXME: Finish.
+
 }

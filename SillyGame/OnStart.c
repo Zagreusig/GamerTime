@@ -178,3 +178,10 @@ ENTTable* InitEntityTable(ENTTable* table) {
 	free(e);
 	free(build);
 }
+
+void BadFlag(bool flag) {
+	if (flag) {
+		//FIXME: Finish.
+	}
+
+}

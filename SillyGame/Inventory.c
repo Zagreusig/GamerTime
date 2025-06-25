@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+
+// FIXME: Add inventory logic.
+
+// FIXME: Create function to reference items for "item required" scenarios.
+
 /*
 bool HasItem() {
 

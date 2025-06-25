@@ -7,7 +7,8 @@
 #include "DifficultyConfig.h"
 
 void WipeMem() {
-
+    // FIXME: Finish this.
+    //        also figure out what this is going to do LOL.
 }
 
 void ErrFunc() {

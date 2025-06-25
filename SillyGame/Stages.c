@@ -7,6 +7,12 @@
 #include "OnStart.h"
 #include "StructDefinitions.h"
 
+// I'm going to change this entire bit. Instead it's going call the Table functions here.
+// They will compile the information for each bassed on hard coded infornation.
+// Eg: Instead of having Elite/Common/Boss functions used to store a master list, they will each
+//	   be coded into a function per enemy with unique IDs and stage IDs. That way I can dynamically
+//     add more enemies to be randomly dispersed into other stages, rather than hard code each enemy into each stage.
+
 Stage* InitStage(Stage* level, int ID) {
 	level->id = ID;
 	level->Enemies = *InitEnemyTable(&level->Enemies);

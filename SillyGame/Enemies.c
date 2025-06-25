@@ -8,6 +8,13 @@
 #include "Enemies.h"
 #include "DifficultyConfig.h"
 
+// FIXME: TypeClass() functions should reference current stage ID and MasterIDList()
+//		  and return the information from corresponding function. They should not build
+//		  the struct variables themselves.
+
+// FIXME: Add Enemy() functions for each type with a favored stage and possible stage for 
+//		  dungeon crawler mode.
+
 Enemy* BossClass(int id) {
 	Enemy* boss = (Enemy*)malloc(sizeof(Enemy));
 	if (boss == NULL) {
