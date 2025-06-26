@@ -83,7 +83,7 @@
     <ClInclude Include="Stages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StructDefinitions.h">
+    <ClInclude Include="Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

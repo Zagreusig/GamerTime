@@ -151,7 +151,7 @@
     <ClInclude Include="MscFuncs.h" />
     <ClInclude Include="OnStart.h" />
     <ClInclude Include="Stages.h" />
-    <ClInclude Include="StructDefinitions.h" />
+    <ClInclude Include="Definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="design.txt" />

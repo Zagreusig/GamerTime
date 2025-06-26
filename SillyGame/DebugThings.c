@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#include "StructDefinitions.h"
+#include "Definitions.h"
 #include "Items.h"
 #include "DifficultyConfig.h"
 #include "Enemies.h"

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "StructDefinitions.h"
+#include "Definitions.h"
 #include "Items.h"
 #include "Enemies.h"
 #include "Entity.h"

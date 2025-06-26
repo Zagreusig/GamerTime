@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "StructDefinitions.h"
+#include "Definitions.h"
 #include "Items.h"
 #include "Inventory.h"
 #include "Entity.h"
@@ -16,6 +16,8 @@ void ErrFunc() {
 	printf("Exiting.\n");
 	WipeMem();
 }
+
+
 
 void DebugStage(Stage* passed) {
     if (passed == NULL) {

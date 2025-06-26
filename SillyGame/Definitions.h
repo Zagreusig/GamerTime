@@ -1,15 +1,16 @@
 #pragma once
-#ifndef STRUCT_DEFINITIONS_H
-#define STRUCT_DEFINITIONS_H
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H
 
 #define MAX_BOSSES 5
 #define MAX_ENEMIES 10
 #define MAX_NPCS 5
 #define MAX_ITEMS 5
-
+#define SECONDARY_STAGE_CHANCE 0.5
 
 typedef struct Enemy_struct {
 	char name[50];
+	int id;
 
 	int MAX_HP;
 	int MAX_DMG;
@@ -18,6 +19,10 @@ typedef struct Enemy_struct {
 	int currhp;
 	int dmg;
 
+	// When on the stage marked by "prefStage", the enemy is more likely to be
+	// chosen. There is a reduced chance to appear on the secondary stage (50% as likely).
+	int prefStage;
+	int secStage;
 
 }Enemy;
 
@@ -58,6 +63,7 @@ typedef struct Item_struct {
 
 typedef struct Item_Table_Struct {
 	Item item[5];
+	int stageID;
 }ITable;
 
 
@@ -68,10 +74,12 @@ typedef struct Item_Table_Struct {
 
 typedef struct Enemy_Table_Struct {
 	Enemy enemy[10];
+	int stageID;
 }EYTable;
 
 typedef struct Boss_Table_Struct {
 	Enemy boss[5];
+	int stageID;
 }BTable;
 
 typedef struct Stage_struct {

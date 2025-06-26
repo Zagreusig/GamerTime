@@ -5,7 +5,7 @@
 #include "Enemies.h"
 #include "Entity.h"
 #include "OnStart.h"
-#include "StructDefinitions.h"
+#include "Definitions.h"
 
 // I'm going to change this entire bit. Instead it's going call the Table functions here.
 // They will compile the information for each bassed on hard coded infornation.
@@ -60,4 +60,8 @@ Stage* StageInfoReference(int ID) {
 end_func:
 	return inDev;
 	free(inDev);
+}
+
+int CountBosses(int StageID, char keyattribute, int key) {
+
 }

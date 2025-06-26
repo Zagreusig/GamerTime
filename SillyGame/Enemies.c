@@ -3,10 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "StructDefinitions.h"
+#include "Definitions.h"
 #include "Entity.h"
 #include "Enemies.h"
 #include "DifficultyConfig.h"
+#include "Stages.h"
 
 // FIXME: TypeClass() functions should reference current stage ID and MasterIDList()
 //		  and return the information from corresponding function. They should not build
@@ -15,35 +16,69 @@
 // FIXME: Add Enemy() functions for each type with a favored stage and possible stage for 
 //		  dungeon crawler mode.
 
-Enemy* BossClass(int id) {
-	Enemy* boss = (Enemy*)malloc(sizeof(Enemy));
-	if (boss == NULL) {
-		printf("Malloc err, BossClass()\n");
-		exit(1);
+Enemy* BossOne(Difficulty* config) {
+	Enemy* b = (Enemy*)malloc(sizeof(Enemy));
+	if (b == NULL) {
+		return NULL;
 	}
-	switch (id)
-	{
-	default:
-		printf("Boss func err\n");
-		break;
-	case 0:
-		strcpy(boss->name, "THIS IS A BOSS!!!");
-		boss->MAX_HP = 50;
-		boss->MAX_DMG = 30;
-		boss->RARITY = 5;
-	case 1:
-		strcpy(boss->name, "THIS IS A DIFFERENT BOSS!!!");
-		boss->MAX_HP = 100;
-		boss->MAX_DMG = 100;
-		boss->RARITY = 2;
-	case 2:
-		strcpy(boss->name, "THIS IS A THIRD CASE WAOH!");
-		boss->MAX_HP = 500;
-		boss->MAX_DMG = 1000;
-		boss->RARITY = 100;
+
+	strcpy(b->name, "BOSS ONE");
+	b->MAX_HP = 50;
+	b->MAX_DMG = 30;
+	b->RARITY = 5;
+	b->prefStage = 0;
+	b->secStage = 1;
+
+	return b;
+	free(b);
+}
+
+Enemy* BossTwo(Difficulty* config) {
+	Enemy* b = (Enemy*)malloc(sizeof(Enemy));
+	if (b == NULL) {
+		return NULL;
 	}
-	return boss;
-	free(boss);
+
+	strcpy(b->name, "BOSS TWO");
+	b->MAX_HP = 100;
+	b->MAX_DMG = 100;
+	b->RARITY = 2;
+
+	return b;
+	free(b);
+}
+
+Enemy* BossThree(Difficulty* config) {
+	Enemy* b = (Enemy*)malloc(sizeof(Enemy));
+	if (b == NULL) {
+		return NULL;
+	}
+
+	strcpy(b->name, "BOSS THREE");
+	b->MAX_HP = 500;
+	b->MAX_DMG = 1000;
+	b->RARITY = 100;
+
+	return b;
+	free(b);
+}
+
+
+
+Enemy* BossClass(int StageID) {
+	int numBosses;
+	int chosen;
+	EYTable* bosses = (EYTable*)malloc(sizeof(EYTable));
+	Enemy* out = (Enemy*)malloc(sizeof(Enemy));
+	if (out == NULL) {
+		return NULL;
+	}
+
+	numBosses = CountBosses(StageID);
+
+
+
+
 }
 
 Enemy* EliteClass(int id) {

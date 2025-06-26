@@ -1,7 +1,7 @@
 #pragma once
 #ifndef ENEMIES_H
 #define ENEMIES_H
-#include "StructDefinitions.h"
+#include "Definitions.h"
 
 Enemy* BossClass(int id);
 Enemy* EliteClass(int id);
