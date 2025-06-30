@@ -142,7 +142,7 @@
     <ClCompile Include="MetDat.c" />
     <ClCompile Include="OnStart.c" />
     <ClCompile Include="Player.c" />
-    <ClCompile Include="SaveGame.c" />
+    <ClCompile Include="GameState.c" />
     <ClCompile Include="StatusEffect.c" />
   </ItemGroup>
   <ItemGroup>

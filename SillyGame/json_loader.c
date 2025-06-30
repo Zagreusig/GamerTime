@@ -203,8 +203,25 @@ int GameState_Load_state(GameState* state, const char* path) {
 	LOAD_EQUIP_SLOT(accessories, p->equipment.accessories, MAX_ACCESSORY_SLOTS);
 	LOAD_EQUIP_SLOT(weapons, p->equipment.weapons, MAX_WEAPON_SLOTS);
 
+	// FIXME: ADD ENTITY LOGIC
+
 	cJSON_Delete(root);
 	free(data);
 	return 1;
 }
 
+void GameState_Init(GameState* state) {
+	memset(state, 0, sizeof(GameState));
+	if (!&state->player) {
+		Player_Init(&state->player, DEFAULT_STATS);
+	}
+}
+
+void GameState_Del(GameState* state) {
+	for (int i = 0; i < state->entity_amount; i++) {
+		free(state->active_entities[i]);
+	}
+	for (int i = 0; i < state->level_items_amount; i++) {
+		free(state->level_items[i]);
+	}
+}
