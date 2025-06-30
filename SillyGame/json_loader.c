@@ -146,6 +146,7 @@ int GameState_Load_state(GameState* state, const char* path) {
 	p->hp = cJSON_GetObjectItem(jplayer, "hp")->valueint;
 	p->dmg = cJSON_GetObjectItem(jplayer, "dmg")->valueint;
 	p->persuasion = cJSON_GetObjectItem(jplayer, "persuasion")->valueint;
+	p->stealth = cJSON_GetObjectItem(jplayer, "stealth")->valueint;
 
 	// Status Effects
 	cJSON* jstats = cJSON_GetObjectItem(jplayer, "status_effects");
@@ -213,7 +214,7 @@ int GameState_Load_state(GameState* state, const char* path) {
 void GameState_Init(GameState* state) {
 	memset(state, 0, sizeof(GameState));
 	if (!&state->player) {
-		Player_Init(&state->player, DEFAULT_STATS);
+		Player_Init(&state->player);
 	}
 }
 

@@ -28,7 +28,7 @@ typedef struct Game_State_struct {
 void GameState_Init(GameState* state);
 void GameState_Del(GameState* state);
 
-void GameState_Save_state(Player* player, const char* filepath);
+void GameState_Save_state(GameState* state, const char* filepath);
 int GameState_Load_state(GameState* state, const char* filepath);
 
 #endif

@@ -12,7 +12,6 @@
 #define MAX_ARMOR_SLOTS 4
 #define MAX_ACCESSORY_SLOTS 2
 #define MAX_WEAPON_SLOTS 2
-#define DEFAULT_STATS 0, "Name", 100, 5, 10, 0
 
 
 
@@ -48,7 +47,7 @@ typedef struct Player_struct {
 }Player;
 
 
-void Player_Init(Player* p, int id, const char* name, int hp, int dmg, int persuasion, int stealth);
+void Player_Init(Player* p);
 void Player_AddStatus(Player* p, const char* effect, double strength, int duration);
 int Player_HasStatus(Player* p, const char* name);
 int Player_RemoveStatus(Player* p, const char* name);

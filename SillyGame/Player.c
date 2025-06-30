@@ -8,15 +8,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-void Player_Init(Player* p, int id, const char* name, int hp, int dmg, int persuasion, int stealth) {
-	p->id = id;
-	p->name = name;
-	p->hp = hp;
-	p->dmg = dmg;
-	p->persuasion = persuasion;
-	p->stealth = stealth;
+// FIXME: Add Player_UpdateStat(Player* p, const char* stat);
+
+void Player_Init(Player* p) {
+	p->id = 0;
+	p->name = "Player";
+	p->hp = 100;
+	p->dmg = 5;
+	p->persuasion = 0;
+	p->stealth = 0;
 	p->status_amount = 0;
 	p->metadata.tag_amt = 0;
+	memset(&p->equipment, 0, sizeof(Equipment));
 	InventoryInit(&p->inventory);
 }
 

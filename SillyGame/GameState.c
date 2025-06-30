@@ -8,14 +8,31 @@
 
 extern ItemRegistry g_item_registry;
 
-void GameState_Save_state(Player* player, const char* filepath) {
+void GameState_Save_state(GameState* state, const char* filepath) {
 	cJSON* root = cJSON_CreateObject();
+	
+	Player* player = &state->player;
+	memset(player, 0, sizeof(Player));
 	cJSON* jplayer = cJSON_CreateObject();
 
 	cJSON_AddStringToObject(jplayer, "name", player->name);
 	cJSON_AddNumberToObject(jplayer, "hp", player->hp);
 	cJSON_AddNumberToObject(jplayer, "dmg", player->dmg);
 	cJSON_AddNumberToObject(jplayer, "persuasion", player->persuasion);
+
+	// Entities
+	cJSON* jentities = cJSON_CreateArray();
+		for (int i = 0; i < state->entity_amount; i++){
+			Entity* e = state->active_entities[i];
+			if (!e) { continue };
+
+			cJSON* je = cJSON_CreateObject();
+			cJSON_AddNumberToObject(je, "id", e->id);
+			cJSON_AddItemToObject(je, "metadata", MD_ToJSON(&e->metadata));
+			cJSON_AddItemToArray(jentities, je);
+		}
+		cJSON_AddItemToObject(root, "entities", jentities);
+
 
 	// Status Effects
 	cJSON* jstatuses = cJSON_CreateArray();
@@ -107,6 +124,26 @@ int GameState_Load_State(GameState* state, const char* path) {
 	player->dmg = cJSON_GetObjectItem(jplayer, "dmg")->valueint;
 	player->persuasion = cJSON_GetObjectItem(jplayer, "persuasion")->valueint;
 	player->stealth = cJSON_GetObjectItem(jplayer, "stealth")->valueint;
+
+	// Entities
+	cJSON* jentities = cJSON_GetObjectItem(root, "entities");
+	if (jentities) {
+		int count = cJSON_GetArraySize(jentities);
+		for (int i = 0; i < count && i < MAX_ENTITIES_PER_LEVEL; i++) {
+			cJSON* je = cJSON_GetArrayItem(jentities, i);
+			if (!cJSON_IsObject(je)) { continue; }
+
+			int id = cJSON_GetObjectItem(je, "id")->valueint;
+			cJSON* jmeta = cJSON_GetObjectItem(je, "metadata");
+			
+			Entity* base = EntityRegistry_CloneByID(id);
+			if (!base) { continue; }
+
+			JSON_ToMD(jmeta, &base->metadata);
+			state->active_entities[state->entity_amount++] = base;
+		}
+	}
+
 
 	// Status effects
 	cJSON* jstatuses = cJSON_GetObjectItem(jplayer, "status_effects");

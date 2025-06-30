@@ -1,50 +1,46 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "Level.h"
-#include "Difficulty.h"
-#include "items.h"
-#include "Entity.h"
-#include "Inventory.h"
+#include "GameState.h"
 #include "json_loader.h"
-#include "OnStart.h"
+#include "Items.h"
+#include "Entity.h"
+#include "Player.h"
+#include "Difficulty.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-void OnStart(Player* p, Item* item, Entity* ent, Level* level) {
-    Player_Init(p, DEFAULT_STATS);
-    printf("Player intialized.\n");
-    int entities_num;
-    int items_num;
+// External global registries
+extern ItemRegistry g_item_registry;
+extern EntityRegistry g_entity_registry;
 
-    entities_num = LoadEntitiesJSON("data/Entities.json", ent, MAX_ENTITIES);
-    items_num = LoadItemJSON("data/Items.json", item, MAX_ITEMS);
-    ItemRegistry_LoadFromJSON("data/Items.json");
-    EntityRegistry_LoadFromJSON("data/Entities.json");
+void OnStart(GameState* game) {
+	GameState_Init(game);
 
-    SetDifficulty(&config, DIFFICULTY_NORMAL);
+	// === Load Item Registry ===
+	memset(&g_item_registry, 0, sizeof(ItemRegistry));
+	int item_count = LoadItemJSON("data/items.json", g_item_registry.items, MAX_ITEM_REGISTRY_SIZE);
+	g_item_registry.numitems = item_count;
+	printf("Loaded %d items into registry.\n", item_count);
+	
+	// === Load Entity Registry ===
+	memset(&g_entity_registry, 0, sizeof(EntityRegistry));
+	int entity_count = LoadEntitiesJSON("data/entities.json", g_entity_registry.entities, MAX_ENTITY_REGISTRY_SIZE);
+	g_entity_registry.numEnt = entity_count;
+	printf("Loaded %d entities into registry.\n", entity_count);
 
-    for (int i = 0; i < entities_num; i++) {
-        ScaleEntityStats(&ent[i], config);
-    }
+	// FIXME: change so that there is a registry for all entity classes
+	// eg: Elite / Boss
 
-    Level_Init(DEFAULT_LEVEL);
+	// === Initialize Player ===
+	Player* player = &game->player;
+	strncpy(player->name, "Player", sizeof(Player));
+	player->hp = 100;
+	player->dmg = 10;
+	player->persuasion = 5;
+	InventoryInit(&player->inventory);
+	player->status_amount = 0;
+	memset(&player->equipment, 0, sizeof(Equipment));
 
-    printf("Loaded %d Entities.\n", entities_num);
-    printf("Loaded %d Items.\n", items_num);
-    printf("Item registry created.\n");
-    printf("Entity registry created.\n");
-    printf("Difficulty set.\n");
-    printf("Entities stats scaled by %0.0lf percent.\n", (config.enemy_multiplier * 100));
-    printf("Level initialized\n");
-
-    printf("\n\nPrinting Debug\n\n");
-
-    PrintPlayer(p);
-    PrintDifficulty(&config);
-    for (int i = 0; i < items_num; i++) {
-        PrintItem(&item[i]);
-    }
-    for (int i = 0; i < entities_num; i++) {
-        PrintEntity(&ent[i]);
-
-    }
+	//FIXME: intitialize difficulty to NORMAL.
 }

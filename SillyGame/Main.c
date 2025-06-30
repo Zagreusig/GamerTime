@@ -13,17 +13,8 @@
 #include "json_loader.h"
 
 int main(void) {
+    GameState* game = malloc(sizeof(GameState));
     Level* level = malloc(sizeof(Level));
-    Entity* entities = malloc(sizeof(Entity) * MAX_ENTITIES);
-    Item* items = malloc(sizeof(Item) * MAX_ITEMS);
-    Player* player = malloc(sizeof(Player));
-
-    if (!level || !entities || !items || !player) {
-        fprintf(stderr, "Memory allocation failure.\n");
-        return 1;
-    }
-
-    OnStart(player, items, entities, level);
 
 
     return 0;
