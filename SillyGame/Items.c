@@ -1,105 +1,66 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #include "Items.h"
-#include "Definitions.h"
+#include "MetDat.h"
+#include "json_loader.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
-Item* GetRare1() {
-    int rng;
-    Item* validItem = (Item*)malloc(sizeof(Item));
-    Item* errItem = (Item*)malloc(sizeof(Item));
-    if (validItem == NULL || errItem == NULL) {
-        printf("Malloc err, GetRare1()\n");
-        exit(1);
-    }
-    // FIXME: Finish this
-    rng = rand() % 4;
+ItemRegistry g_item_registry = { 0 };
 
-    if (rng == 0) {
-        DullBlade(validItem);
-        return validItem;
-    }
-    else if (rng == 1) {
-        SharpSword(validItem);
-        return validItem;
-    }
-    else if (rng == 2) {
-        HerosSword(validItem);
-        return validItem;
-    }
-    else {
-        errItem->id = -1;
-        return errItem;
-    }
+void CreateItem(Item* item, int id, const char* name, int damage, int durability, const char* description) {
+	item->id = id;
+	item->metadata.tag_amt = 0;
 
+	MD_SetString(&item->metadata, "Name", name);
+	MD_SetString(&item->metadata, "Description", description);
+	MD_SetInt(&item->metadata, "Damage", damage);
+	MD_SetInt(&item->metadata, "Durability", durability);
 }
 
-Item* LootDrop(int stageID, int rarity) {
-    Item* dest = (Item*)malloc(sizeof(Item));
-    if (dest == NULL) {
-        printf("\nMalloc err LootDrop()\n");
-        exit(1);
+void Item_Create_FromMD(Item* item, int id, MD* md) {
+    item->id = id;
+    item->metadata.tag_amt = md->tag_amt;
+    for (int i = 0; i < md->tag_amt; i++) {
+        item->metadata.tags[i] = md->tags[i];
+    }
+}
+
+void PrintItem(const Item* item) {
+    char name[128], desc[128];
+    int durability, damage;
+
+    MD_GetString((MD*)&item->metadata, "Name", name, sizeof(name));
+    MD_GetString((MD*)&item->metadata, "Description", desc, sizeof(desc));
+    MD_GetInt((MD*)&item->metadata, "Durability", &durability);
+    MD_GetInt((MD*)&item->metadata, "Damage", &damage);
+
+    printf("Item ID: %d\n", item->id);
+    printf("Name: %s\n", name);
+    printf("Durability: %d\n", durability);
+    printf("Damage: %d\n", damage);
+    printf("Description: %s\n", desc);
+}
+
+void ItemRegistry_LoadFromJSON(const char* path) {
+    g_item_registry.numitems = LoadItemJSON(path, g_item_registry.items, MAX_ITEM_REGISTRY_SIZE);
+}
+
+const Item* ItemRegistry_GetByID(int id) {
+    for (int i = 0; i < g_item_registry.numitems; i++) {
+        if (g_item_registry.items[i].id == id) {
+            return &g_item_registry.items[i];
+        }
     }
     return NULL;
 }
 
-Item* DullBlade(Item* dullBlade) {
-	dullBlade->id = 0;
-	strcpy(dullBlade->name, "Dull Blade");
-	strcpy(dullBlade->description, "A dull blade.\n");
-    strcat(dullBlade->description, "\t\tNothing special about it.\n");
-    strcat(dullBlade->description, "\t\tThis is a third line of text.");
-    dullBlade->hp = 3;
-    dullBlade->dmg = 2;
-	return dullBlade;
-}
+Item* ItemRegistry_CloneByID(int id) {
+    const Item* base = ItemRegistry_GetByID(id);
+    if (!base) { return NULL; }
 
-Item* SharpSword(Item* sharpSword) {
-    sharpSword->id = 1;
-    strcpy(sharpSword->name, "Sharp Sword");
-    strcpy(sharpSword->description, "A sharp sword.\n");
-    strcat(sharpSword->description, "\t\tMuch better than your last tool.\n");
-    strcat(sharpSword->description, "\t\tSimply better.\n");
-    sharpSword->hp = 6;
-    sharpSword->dmg = 5;
-    return sharpSword;
-}
+    Item* clone = malloc(sizeof(Item));
+    if (!clone) { return NULL; }
 
-Item* HerosSword(Item* herosSword){
-    herosSword->id = 2;
-    strcpy(herosSword->name, "Hero's Sword");
-    strcpy(herosSword->description, "The Legendary Hero's Sword.\n");
-    strcat(herosSword->description, "\t\tThe infamous sword the Hero used to\n");
-    strcat(herosSword->description, "\t\tdefeat the awful beast and save the land.\n");
-    herosSword->hp = 15;
-    herosSword->dmg = 20;
-    return herosSword;
-}
-
-// FIXME: Make this into an Item Table type function.
-//        should build a table containing all items and return.
-Item* ItemIDsMaster(int code) {
-    Item* call = (Item*)malloc(sizeof(Item));
-    if (code == 0) {
-        DullBlade(call);
-        return call;
-    }
-    if (code == 1) {
-        SharpSword(call);
-        return call;
-    }
-    if (code == 2) {
-        HerosSword(call);
-        return call;
-    }
-    return NULL;
-}
-
-Item* ItemReference(ITable* MasterList, int idcode) {
-
-    // FIXME: Finish.
-
+    memcpy(clone, base, sizeof(Item));
+    return clone;
 }

@@ -1,187 +1,50 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include "Definitions.h"
-#include "Items.h"
-#include "Enemies.h"
+#include "Level.h"
+#include "Difficulty.h"
+#include "items.h"
 #include "Entity.h"
 #include "Inventory.h"
+#include "json_loader.h"
 #include "OnStart.h"
+#include <stdio.h>
 
-//void StartUp(ITable* items, EYTable* enemies, ENTTable* entities, BTable* bosses) {
-//	bool item = false, enemy = false, boss = false, npc = false;
-//	int err = 0;
-//	
-//	item = ItemTablesFinished(item, items);
-//	enemy = EnemyTablesFinished(item, enemies);
-//	npc = NPCTablesFinished(item, entities);
-//	boss = BossTableFinished(item, bosses);
-//
-//	if (!item) {
-//		err = 1;
-//	}
-//	else {
-//		printf("Item tables successfully initialized.\n");
-//	}
-//
-//	if (!enemy) {
-//		err = 2;
-//	}
-//	else {
-//		printf("Enemy tables successfully initialized.\n");
-//	}
-//
-//	if (!boss) {
-//		err = 3;
-//	}
-//	else {
-//		printf("Boss tables successfully initialized.\n");
-//	}
-//
-//	if (!npc) {
-//		err = 4;
-//	}
-//	else {
-//		printf("Npc tables successfullly initalized.\n");
-//	}
-//
-//	if (err = 0) {
-//		printf("All initializations successful.\n");
-//	}
-//
-//
-//}
+void OnStart(Player* p, Item* item, Entity* ent, Level* level) {
+    Player_Init(p, DEFAULT_STATS);
+    printf("Player intialized.\n");
+    int entities_num;
+    int items_num;
 
-/*bool ItemTablesFinished(bool out, ITable* table) {
-	if (table == NULL) {
-		return false;
-	}
-	else {
-		return true;
-	}
-}
+    entities_num = LoadEntitiesJSON("data/Entities.json", ent, MAX_ENTITIES);
+    items_num = LoadItemJSON("data/Items.json", item, MAX_ITEMS);
+    ItemRegistry_LoadFromJSON("data/Items.json");
+    EntityRegistry_LoadFromJSON("data/Entities.json");
 
-bool EnemyTablesFinished(bool out, EYTable* table) {
-	if (table == NULL) {
-		return false;
-	}
-	else {
-		return true;
-	}
-}
+    SetDifficulty(&config, DIFFICULTY_NORMAL);
 
-bool BossTableFinished(bool out, BTable* table) {
-	if (table == NULL) {
-		return false;
-	}
-	else {
-		return true;
-	}
-}
+    for (int i = 0; i < entities_num; i++) {
+        ScaleEntityStats(&ent[i], config);
+    }
 
-bool NPCTablesFinished(bool out, ENTTable* table) {
-	if (table == NULL) {
-		return false;
-	}
-	else {
-		return true;
-	}
-}*/
+    Level_Init(DEFAULT_LEVEL);
 
-ITable* InitLootTables(ITable* table, int stageID) {
-	ITable* build = (ITable*)malloc(sizeof(ITable));
-	Item* item = (Item*)malloc(sizeof(Item));
-	for (int i = 0; i < MAX_ITEMS; i++) {
-		item = ItemIDsMaster(i);
-		if (item == NULL) {
-			goto end_func;
-		}
-		build->item[i] = *item;
-	}
-	end_func:
-	table = build;
-	free(build);
-	free(item);
-	return table;
-}
+    printf("Loaded %d Entities.\n", entities_num);
+    printf("Loaded %d Items.\n", items_num);
+    printf("Item registry created.\n");
+    printf("Entity registry created.\n");
+    printf("Difficulty set.\n");
+    printf("Entities stats scaled by %0.0lf percent.\n", (config.enemy_multiplier * 100));
+    printf("Level initialized\n");
 
-EYTable* InitEnemyTable(EYTable* table) { // Stage ID ?
-	EYTable* build = (EYTable*)malloc(sizeof(EYTable));
-	Enemy* enemy = (Enemy*)malloc(sizeof(Enemy));
-	int j = 0;
-	int r = 0;
-	for (int i = 0; i < MAX_ENEMIES; i++) {
-		if (i < 3) {
-			enemy = CommonClass(i);
-		}
-		if (i >= 3 && i < 6) {
-			enemy = EliteClass(j);
-			j++;
-		}
-		if (i >= 6) {
-			enemy = SecretSecret();
-			r = 1;
-		}
-		build->enemy[i] = *enemy;
-		if (r == 1) {
-			goto end_function;
-		}
-	}
+    printf("\n\nPrinting Debug\n\n");
 
-end_function:
-	return build;
-	free(build);
-	free(enemy);
-}
+    PrintPlayer(p);
+    PrintDifficulty(&config);
+    for (int i = 0; i < items_num; i++) {
+        PrintItem(&item[i]);
+    }
+    for (int i = 0; i < entities_num; i++) {
+        PrintEntity(&ent[i]);
 
-BTable* InitBossTable(BTable* table) {
-	BTable* build = (BTable*)malloc(sizeof(BTable));
-	Enemy* boss = (Enemy*)malloc(sizeof(Enemy));
-
-	for (int i = 0; i < MAX_BOSSES; i++) {
-		boss = BossClass(i);
-		if (boss == NULL) {
-			goto end_func;
-		}
-		build->boss[i] = *boss;
-	}
-
-
-end_func:
-	table = build;
-	free(boss);
-	free(build);
-	return table;
-}
-
-ENTTable* InitEntityTable(ENTTable* table) {
-	ENTTable* build = (ENTTable*)malloc(sizeof(ENTTable));
-	Entity* e = (Entity*)malloc(sizeof(Entity));
-
-	e->damage = 1;
-	e->health = 1;
-	e->id = 1;
-	e->interact = 'c';
-	e->persuation = 1;
-	e->type = 1;
-
-	build->entity[0] = *e;
-	build->entity[1] = *e;
-	build->entity[2] = *e;
-	build->entity[3] = *e;
-	build->entity[4] = *e;
-
-	return build;
-	free(e);
-	free(build);
-}
-
-void BadFlag(bool flag) {
-	if (flag) {
-		//FIXME: Finish.
-	}
-
+    }
 }

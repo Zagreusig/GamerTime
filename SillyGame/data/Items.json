@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "name": "Test Item",
+        "durability": 50,
+        "damage": 15,
+        "description": "This is a test",
+        "primaryStage": 1,
+        "secondaryStage": 2
+    },
+    {
+        "id": 2,
+        "name": "Second Item",
+        "durability": 15,
+        "damage": 115,
+        "description": "Common item lmao",
+        "primaryStage": 2,
+        "secondaryStage": 5
+    }
+]

@@ -127,35 +127,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DebugThings.c" />
-    <ClCompile Include="DifficultyConfig.c" />
-    <ClCompile Include="Encounters.c" />
-    <ClCompile Include="Enemies.c" />
+    <Text Include="design.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cJSON.c" />
+    <ClCompile Include="DebugFuncs.c" />
+    <ClCompile Include="Difficulty.c" />
+    <ClCompile Include="Entity.c" />
     <ClCompile Include="Inventory.c" />
     <ClCompile Include="Items.c" />
-    <ClCompile Include="Main.c" />
-    <ClCompile Include="Menus.c" />
-    <ClCompile Include="MscFuncs.c" />
-    <ClCompile Include="Entity.c" />
+    <ClCompile Include="json_loader.c" />
+    <ClCompile Include="Level.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="MetDat.c" />
     <ClCompile Include="OnStart.c" />
-    <ClCompile Include="Scenes.c" />
-    <ClCompile Include="Stages.c" />
+    <ClCompile Include="Player.c" />
+    <ClCompile Include="SaveGame.c" />
+    <ClCompile Include="StatusEffect.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="DifficultyConfig.h" />
-    <ClInclude Include="Enemies.h" />
+    <ClInclude Include="cJSON.h" />
+    <ClInclude Include="Difficulty.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="Items.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="MscFuncs.h" />
+    <ClInclude Include="json_loader.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="MetDat.h" />
     <ClInclude Include="OnStart.h" />
-    <ClInclude Include="Stages.h" />
-    <ClInclude Include="Definitions.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="design.txt" />
-    <Text Include="Items.txt" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="StatusEffects.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

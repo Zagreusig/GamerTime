@@ -1,11 +1,9 @@
 #pragma once
-#ifndef ONSTART_H
-#define ONSTART_H
-#include "StructDefinitions.h"
+#ifndef ON_START_H
+#define ON_START_H
 
-ITable* InitLootTables(ITable* table, int stageID);
-EYTable* InitEnemyTable(EYTable* table);
-BTable* InitBossTable(BTable* table);
-ENTTable* InitEntityTable(ENTTable* table);
+#include "Level.h"
+
+void OnStart(Player* p, Item* item, Entity* ent, Level* level);
 
 #endif

@@ -15,84 +15,90 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.c">
+    <Text Include="design.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StatusEffect.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Inventory.c">
+    <ClCompile Include="SaveGame.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Menus.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MscFuncs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Scenes.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Items.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DifficultyConfig.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Encounters.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemies.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugThings.c">
+    <ClCompile Include="Player.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OnStart.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Stages.c">
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MetDat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Items.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="json_loader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Inventory.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cJSON.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugFuncs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Difficulty.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Inventory.h">
+    <ClInclude Include="cJSON.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Difficulty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Items.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DifficultyConfig.h">
+    <ClInclude Include="json_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MscFuncs.h">
+    <ClInclude Include="Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Enemies.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.h">
+    <ClInclude Include="MetDat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OnStart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Stages.h">
+    <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Definitions.h">
+    <ClInclude Include="StatusEffects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="design.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
-    <Text Include="Items.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>

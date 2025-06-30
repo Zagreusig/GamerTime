@@ -1,0 +1,24 @@
+[
+    {
+        "id": 1,
+        "name": "Test Entity",
+        "baseHP": 100,
+        "baseDMG": 10000,
+        "rarity": "Legendary",
+        "opinion": -100,
+        "primaryStage": 1,
+        "secondaryStage": 2,
+        "spawnWeight": 3.5
+    },
+    {
+        "id": 2,
+        "name": "Test Ent 2",
+        "baseHP": 5,
+        "baseDMG": 100,
+        "rarity": "Common",
+        "opinion": 50,
+        "primaryStage": 0,
+        "secondaryStage": 0,
+        "spawnWeight":  1.5
+    }
+]
