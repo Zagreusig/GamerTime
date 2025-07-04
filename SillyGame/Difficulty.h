@@ -20,7 +20,7 @@ typedef struct Difficulty_Config_struct {
     double jester_chance;
 }DConfig;
 
-extern DConfig config;
+extern DConfig g_difficulty;
 
 void SetDifficulty(DConfig* config, Difficulty diff);
 void CustomDifficulty(DConfig* config, double player, double enemies, double npcs, double jester);

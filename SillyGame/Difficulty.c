@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 
-DConfig config = { 0 };
+DConfig g_difficulty = { 0 };
 
 void Difficulty_Init() {
-	SetDifficulty(&config, DIFFICULTY_NORMAL);
+	SetDifficulty(&g_difficulty, DIFFICULTY_NORMAL);
 }
 
 void SetDifficulty(DConfig* config, Difficulty diff) {

@@ -16,7 +16,7 @@ void Level_AddEntityIfMatch(Level* level, Entity* e) {
         MD_GetInt(&e->metadata, "SecondaryStage", &secondary)) {
 
         if (primary == level->id || secondary == level->id) {
-            if (level->entity_amount < MAX_STAGE_ENTITIES) {
+            if (level->entity_amount < MAX_ENTITIES_PER_LEVEL) {
                 level->entities[level->entity_amount++] = e;
             }
         }
@@ -35,7 +35,7 @@ void Level_PrintEntities(const Level* level) {
 
 Entity* Level_GrabRandEntity(Level* level) {
     int total_weight = 0;
-    int weights[MAX_STAGE_ENTITIES];
+    int weights[MAX_ENTITIES_PER_LEVEL];
 
     for (int i = 0; i < level->entity_amount; ++i) {
         int weight = 1;
@@ -62,7 +62,7 @@ void Level_AddItemIfMatch(Level* level, Item* item) {
         MD_GetInt(&item->metadata, "SecondaryStage", &secondary)) {
 
         if (primary == level->id || secondary == level->id) {
-            if (level->item_amount < MAX_LEVEL_ITEMS) {
+            if (level->item_amount < MAX_ITEMS_IN_LEVEL) {
                 level->items[level->item_amount++] = item;
             }
         }

@@ -1,38 +1,40 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+/*
+*	
+*  Zagreus Silvey 06/2025
+*  This file serves to create a "shadow" of the game to be serialized for saves.
+*  Calls on the difficulty, item and entity registries to do so. 
+*  Utilizing cJSON to store into a JSON file.
+* 
+*/
+
 #include "cJSON.h"
 #include "json_loader.h"
 #include "Player.h"
 #include "GameState.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 extern ItemRegistry g_item_registry;
+extern EntityRegistry g_entity_registry;
+extern DConfig g_difficulty;
+
+GameState g_save_state = NULL;
 
 void GameState_Save_state(GameState* state, const char* filepath) {
 	cJSON* root = cJSON_CreateObject();
-	
+	cJSON* jplayer = cJSON_CreateObject();
+
 	Player* player = &state->player;
 	memset(player, 0, sizeof(Player));
-	cJSON* jplayer = cJSON_CreateObject();
 
 	cJSON_AddStringToObject(jplayer, "name", player->name);
 	cJSON_AddNumberToObject(jplayer, "hp", player->hp);
 	cJSON_AddNumberToObject(jplayer, "dmg", player->dmg);
 	cJSON_AddNumberToObject(jplayer, "persuasion", player->persuasion);
-
-	// Entities
-	cJSON* jentities = cJSON_CreateArray();
-		for (int i = 0; i < state->entity_amount; i++){
-			Entity* e = state->active_entities[i];
-			if (!e) { continue };
-
-			cJSON* je = cJSON_CreateObject();
-			cJSON_AddNumberToObject(je, "id", e->id);
-			cJSON_AddItemToObject(je, "metadata", MD_ToJSON(&e->metadata));
-			cJSON_AddItemToArray(jentities, je);
-		}
-		cJSON_AddItemToObject(root, "entities", jentities);
-
 
 	// Status Effects
 	cJSON* jstatuses = cJSON_CreateArray();
@@ -60,22 +62,6 @@ void GameState_Save_state(GameState* state, const char* filepath) {
 
 	//Equipment
 	cJSON* jequip = cJSON_CreateObject();
-	#define SERIALIZE_SLOT_ARRAY(name, arr, count) \
-	do { \
-		cJSON* j##name = cJSON_CreateArray(); \
-		for (int i = 0; i < count; i++){ \
-		if (arr[i]){ \
-			cJSON* itemObj = cJSON_CreateObject(); \
-			cJSON_AddNumberToObject(itemObj, "id", arr[i]->id); \
-			cJSON_AddItemToObject(itemObj, "metadata", MD_ToJSON(&arr[i]->metadata)); \
-			cJSON_AddItemToArray(j##name, itemObj); \
-			} else { \
-			cJSON_AddItemToArray(j##name, cJSON_CreateNull()); \
-			} \
-		} \
-		cJSON_AddItemToObject(jequip, #name, j##name); \
-	} while(0)
-
 	SERIALIZE_SLOT_ARRAY(armor, player->equipment.armor, MAX_ARMOR_SLOTS);
 	SERIALIZE_SLOT_ARRAY(accessories, player->equipment.accessories, MAX_ACCESSORY_SLOTS);
 	SERIALIZE_SLOT_ARRAY(weapons, player->equipment.weapons, MAX_WEAPON_SLOTS);
@@ -83,8 +69,53 @@ void GameState_Save_state(GameState* state, const char* filepath) {
 	cJSON_AddItemToObject(jplayer, "equipment", jequip);
 	cJSON_AddItemToObject(root, "player", jplayer);
 
+	cJSON* jdifficulty = cJSON_CreateObject();
+	cJSON_AddNumberToObject(jdifficulty, "id", g_difficulty.diff)->valueint;
+	cJSON_AddItemToObject(root, "difficulty", jdifficulty);
+
+
+	// Things coming from the level struct.
+	Level* level = &state->current_level;
+	cJSON* jlevel = cJSON_CreateObject();
+	if (!level || !jlevel) { fprintf(stderr, "[saving] err with level data.\n"); exit(1); }
+	
+	cJSON_AddNumberToObject(jlevel, "id", level->id)->valueint;
+	cJSON_AddStringToObject(jlevel, "name", level->name);
+
+	// Entities
+	cJSON* jentities = cJSON_CreateArray();
+	for (int i = 0; i < level->entity_amount; i++) {
+		Entity* e = level->entities[i];
+		if (!e) { continue; }
+
+		cJSON* je = cJSON_CreateObject();
+		cJSON_AddNumberToObject(je, "id", e->id);
+		cJSON_AddItemToObject(je, "metadata", MD_ToJSON(&e->metadata));
+		cJSON_AddItemToArray(jentities, je);
+	}
+	cJSON_AddItemToObject(jlevel, "entities", jentities);
+
+
+	// Items
+	cJSON* jitems = cJSON_CreateArray();
+	for (int i = 0; i < level->item_amount; i++) {
+		Item* t = level->items[i];
+		if (!t) { continue; }
+
+		cJSON* jt = cJSON_CreateObject();
+		cJSON_AddNumberToObject(jt, "id", t->id)->valueint;
+		cJSON_AddItemToObject(jt, "metdata", MD_ToJSON(&t->metadata));
+		cJSON_AddItemToArray(jitems, jt);
+	}
+	cJSON_AddItemToObject(jlevel, "items", jitems);
+	cJSON_AddItemToObject(root, "level", jlevel);
+
 	char* json_string = cJSON_Print(root);
 	FILE* file = fopen(filepath, "w");
+	if (!file) {
+		fprintf(stderr, "[saving] Error creating save file.\n");
+		exit(1);
+	}
 	if (file) {
 		fprintf(file, "%s\n", json_string);
 		fclose(file);
@@ -111,11 +142,7 @@ int GameState_Load_State(GameState* state, const char* path) {
 	free(data);
 
 	cJSON* jplayer = cJSON_GetObjectItem(root, "player");
-	if (!jplayer) {
-		cJSON_Delete(root);
-		return 0;
-	}
-
+	if (!jplayer) { cJSON_Delete(root); return 0; }
 	Player* player = &state->player;
 	memset(player, 0, sizeof(Player));
 
@@ -124,26 +151,6 @@ int GameState_Load_State(GameState* state, const char* path) {
 	player->dmg = cJSON_GetObjectItem(jplayer, "dmg")->valueint;
 	player->persuasion = cJSON_GetObjectItem(jplayer, "persuasion")->valueint;
 	player->stealth = cJSON_GetObjectItem(jplayer, "stealth")->valueint;
-
-	// Entities
-	cJSON* jentities = cJSON_GetObjectItem(root, "entities");
-	if (jentities) {
-		int count = cJSON_GetArraySize(jentities);
-		for (int i = 0; i < count && i < MAX_ENTITIES_PER_LEVEL; i++) {
-			cJSON* je = cJSON_GetArrayItem(jentities, i);
-			if (!cJSON_IsObject(je)) { continue; }
-
-			int id = cJSON_GetObjectItem(je, "id")->valueint;
-			cJSON* jmeta = cJSON_GetObjectItem(je, "metadata");
-			
-			Entity* base = EntityRegistry_CloneByID(id);
-			if (!base) { continue; }
-
-			JSON_ToMD(jmeta, &base->metadata);
-			state->active_entities[state->entity_amount++] = base;
-		}
-	}
-
 
 	// Status effects
 	cJSON* jstatuses = cJSON_GetObjectItem(jplayer, "status_effects");
@@ -183,29 +190,48 @@ int GameState_Load_State(GameState* state, const char* path) {
 	// Equipment
 	cJSON* jequip = cJSON_GetObjectItem(jplayer, "equipment");
 	if (jequip) {
-#define DESERIALIZE_SLOT_ARRAY(name, arr, max)\
-		do {\
-			cJSON* j##name = cJSON_GetObjectItem(jequip, #name);\
-			if (j##name){\
-				int len = cJSON_GetArraySize(j##name); \
-				for (int i = 0; i < len && i < max; i++){ \
-					cJSON* slot = cJSON_GetArrayItem(j##name, i); \
-					if (!cJSON_IsObject(slot)) {arr[i] = NULL; continue; } \
-					int id = cJSON_GetObjectItem(slot, "id")->valueint; \
-					cJSON* jmeta = cJSON_GetObjectItem(slot, "metadata"); \
-					const Item* base = ItemRegistry_GetByID(id); \
-					if (!base) {arr[i] = NULL; continue; } \
-					arr[i] = malloc(sizeof(Item)); \
-					memcpy(arr[i], base, sizeof(Item)); \
-					JSON_ToMD(jmeta, &arr[i]->metadata); \
-				}\
-			}\
-		} while (0) 
-	
+
 		DESERIALIZE_SLOT_ARRAY(armor, player->equipment.armor, MAX_ARMOR_SLOTS);
 		DESERIALIZE_SLOT_ARRAY(accessories, player->equipment.accessories, MAX_ACCESSORY_SLOTS);
 		DESERIALIZE_SLOT_ARRAY(weapons, player->equipment.weapons, MAX_WEAPON_SLOTS);
 	}
+
+	
+	// Deserializing level.
+
+	cJSON* jlevel = cJSON_GetObjectItem(root, "level");
+	if (!jlevel) { cJSON_Delete(root); return 0; }
+	Level* level = &state->current_level;
+	memset(level, 0, sizeof(Level));
+
+	level->id = cJSON_GetObjectItem(jlevel, "id");
+	level->name = cJSON_GetObjectItem(jlevel, "name");
+
+	// Entities
+	cJSON* jentities = cJSON_GetObjectItem(jlevel, "entities");
+	if (jentities) {
+		int count = cJSON_GetArraySize(jentities);
+		for (int i = 0; i < count && i < MAX_ENTITIES_PER_LEVEL; i++) {
+			cJSON* je = cJSON_GetArrayItem(jentities, i);
+			if (!cJSON_IsObject(je)) { continue; }
+
+			int id = cJSON_GetObjectItem(je, "id")->valueint;
+			cJSON* jmeta = cJSON_GetObjectItem(je, "metadata");
+
+			Entity* base = EntityRegistry_CloneByID(id);
+			if (!base) { continue; }
+
+			JSON_ToMD(jmeta, &base->metadata);
+			level->entities[level->entity_amount++] = base;
+		}
+	}
+
+	cJSON* jdifficulty = cJSON_GetObjectItem(root, "difficulty");
+	int id = cJSON_GetObjectItem(jdifficulty, "id");
+	if (id >= 0) { SetDifficulty(&g_difficulty, id); }
+
+	state->current_level = level;
+	state->player = player;
 
 	cJSON_Delete(root);
 	return 1;

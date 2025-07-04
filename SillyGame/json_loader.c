@@ -219,10 +219,7 @@ void GameState_Init(GameState* state) {
 }
 
 void GameState_Del(GameState* state) {
-	for (int i = 0; i < state->entity_amount; i++) {
-		free(state->active_entities[i]);
-	}
-	for (int i = 0; i < state->level_items_amount; i++) {
-		free(state->level_items[i]);
-	}
+	free(state->player);
+	free(state->current_level);
+	free(state);
 }

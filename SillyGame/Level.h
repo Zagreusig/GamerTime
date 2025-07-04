@@ -4,17 +4,19 @@
 
 #include "Entity.h"
 #include "Items.h"
+#include "GameState.h"
 
-#define MAX_STAGE_ENTITIES 64
-#define MAX_LEVEL_ITEMS 64
 #define DEFAULT_LEVEL &level, 0, "Default"
+
+#define MAX_ENTITIES_PER_LEVEL 32
+#define MAX_ITEMS_IN_LEVEL 64
 
 typedef struct Level_struct{
     int id;
     const char* name;
-    Entity* entities[MAX_STAGE_ENTITIES];
+    Entity* entities[MAX_ENTITIES_PER_LEVEL];
     int entity_amount;
-    Item* items[MAX_LEVEL_ITEMS];
+    Item* items[MAX_ITEMS_IN_LEVEL];
     int item_amount;
 } Level;
 
