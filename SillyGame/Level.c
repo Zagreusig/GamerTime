@@ -5,9 +5,41 @@
 #include <string.h>
 
 void Level_Init(Level* level, int id, const char* name) {
-    level->id = id;
-    level->name = name;
+    if (id && name) {
+        level->id = id;
+        level->name = name;
+    }
+    else {
+        level->id = 0;
+        level->name = "Name";
+    }
     level->entity_amount = 0;
+    level->item_amount = 0;
+    
+    
+    //FIXME: Remove (here for debug)
+    int countere = 0, counteri = 0;
+    for (int i = 0; i < MAX_ENTITIES_PER_LEVEL; i++) {
+        if (EntityRegistry_CloneByID == NULL) { break; }
+        else {
+            level->entities[i] = EntityRegistry_CloneByID(i);
+            countere++;
+        }
+    }
+    for (int i = 0; i < MAX_ITEMS_IN_LEVEL; i++) {
+        if (ItemRegistry_CloneByID(i) == NULL) { break; }
+        else {
+            level->items[i] = ItemRegistry_CloneByID(i);
+            counteri++;
+        }
+    }
+    level->item_amount = counteri;
+    level->entity_amount = countere;
+
+
+    // FIXME: Add in lookup by level id for monsters and init them here.
+    /*for (int i = 0; i < MAX_ENTITIES_PER_LEVEL; i++) { level->entities[i] = NULL; }
+    for (int i = 0; i < MAX_ITEMS_IN_LEVEL; i++) { level->items[i] = NULL; }*/
 }
 
 void Level_AddEntityIfMatch(Level* level, Entity* e) {
@@ -34,8 +66,7 @@ void Level_PrintEntities(const Level* level) {
 }
 
 Entity* Level_GrabRandEntity(Level* level) {
-    int total_weight = 0;
-    int weights[MAX_ENTITIES_PER_LEVEL];
+    int total_weight = 0, weights[MAX_ENTITIES_PER_LEVEL] = { 0 };
 
     for (int i = 0; i < level->entity_amount; ++i) {
         int weight = 1;

@@ -12,10 +12,30 @@
 #include "Difficulty.h"
 #include "json_loader.h"
 
-int main(void) {
-    GameState* game = malloc(sizeof(GameState));
-    Level* level = malloc(sizeof(Level));
+extern EntityRegistry g_entity_registry;
+extern ItemRegistry g_item_registry;
+extern GameState g_save_state;
 
+int main(void) {
+    OnStart();
+    NewGame();
+    GameState_Save_state(&g_save_state, "data/savestate.json");
+    
+    int load;
+    load = GameState_Load_State(&g_save_state, "data/savestate.json");
+
+    if (load == 0) { printf("err"); exit(1); }
+
+    if (g_save_state.current_level) { printf("[ State ] Verified Level data.\n"); }
+    if (g_save_state.player) { printf("[ State ] Verified Player data.\n"); }
+
+    PrintPlayer(&g_save_state.player);
+    printf("\n[ Level ] ID: %d", g_save_state.current_level->id);
+    printf("\n[ Level ] Name: %s", g_save_state.current_level->name);
+    printf("\n[ Level ] Ent count: %d", g_save_state.current_level->entity_amount);
+    printf("\n[ Level ] Item count: %d", g_save_state.current_level->item_amount);
+
+    printf("\n All Tests passed.\n");
 
     return 0;
 }

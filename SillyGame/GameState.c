@@ -13,6 +13,7 @@
 #include "json_loader.h"
 #include "Player.h"
 #include "GameState.h"
+#include "NewGameState.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,213 +23,306 @@ extern ItemRegistry g_item_registry;
 extern EntityRegistry g_entity_registry;
 extern DConfig g_difficulty;
 
-GameState g_save_state = NULL;
+GameState g_save_state = { NULL };
 
 void GameState_Save_state(GameState* state, const char* filepath) {
-	cJSON* root = cJSON_CreateObject();
-	cJSON* jplayer = cJSON_CreateObject();
+    if (!state || !state->player || !state->current_level) {
+        fprintf(stderr, "[saving] Invalid game state (missing player or level).\n");
+        exit(1);
+    }
 
-	Player* player = &state->player;
-	memset(player, 0, sizeof(Player));
+    bool success = false;
+    cJSON* root = cJSON_CreateObject();
+    if (!root) { fprintf(stderr, "[saving] Failed to create root JSON.\n"); exit(1); }
 
-	cJSON_AddStringToObject(jplayer, "name", player->name);
-	cJSON_AddNumberToObject(jplayer, "hp", player->hp);
-	cJSON_AddNumberToObject(jplayer, "dmg", player->dmg);
-	cJSON_AddNumberToObject(jplayer, "persuasion", player->persuasion);
+    // --- PLAYER ---
+    Player* player = state->player;
+    cJSON* jplayer = cJSON_CreateObject();
+    if (!jplayer) { fprintf(stderr, "[saving] Failed to create jplayer.\n"); goto cleanup; }
 
-	// Status Effects
-	cJSON* jstatuses = cJSON_CreateArray();
-	for (int i = 0; i < player->status_amount; i++) {
-		PlayerStatus* stat = &player->status_effects[i];
-		cJSON* jstatus = cJSON_CreateObject();
-		cJSON_AddStringToObject(jstatus, "name", stat->name);
-		cJSON_AddNumberToObject(jstatus, "strength", stat->strength);
-		cJSON_AddNumberToObject(jstatus, "duration", stat->duration);
-		cJSON_AddNumberToObject(jstatus, "stacks", stat->stacks);
-		cJSON_AddItemToArray(jstatuses, jstatus);
-	}
-	cJSON_AddItemToObject(jplayer, "status_effects", jstatuses);
+    cJSON_AddStringToObject(jplayer, "name", player->name);
+    cJSON_AddNumberToObject(jplayer, "hp", player->hp);
+    cJSON_AddNumberToObject(jplayer, "dmg", player->dmg);
+    cJSON_AddNumberToObject(jplayer, "persuasion", player->persuasion);
 
-	// Inventory
-	cJSON* jinv = cJSON_CreateArray();
-	for (int i = 0; i < player->inventory.totalItems; i++) {
-		Item* item = player->inventory.items[i];
-		cJSON* jitem = cJSON_CreateObject();
-		cJSON_AddNumberToObject(jitem, "id", item->id);
-		cJSON_AddItemToObject(jitem, "metadata", MD_ToJSON(&item->metadata));
-		cJSON_AddItemToArray(jinv, jitem);
-	}
-	cJSON_AddItemToObject(jplayer, "inventory", jinv);
+    // --- Status Effects ---
+    cJSON* jstatuses = cJSON_CreateArray();
+    if (!jstatuses) { fprintf(stderr, "[saving] Failed to create status array.\n"); goto cleanup; }
 
-	//Equipment
-	cJSON* jequip = cJSON_CreateObject();
-	SERIALIZE_SLOT_ARRAY(armor, player->equipment.armor, MAX_ARMOR_SLOTS);
-	SERIALIZE_SLOT_ARRAY(accessories, player->equipment.accessories, MAX_ACCESSORY_SLOTS);
-	SERIALIZE_SLOT_ARRAY(weapons, player->equipment.weapons, MAX_WEAPON_SLOTS);
+    for (int i = 0; i < player->status_amount; i++) {
+        PlayerStatus* stat = &player->status_effects[i];
+        cJSON* jstatus = cJSON_CreateObject();
+        if (!jstatus) continue;
+        cJSON_AddStringToObject(jstatus, "name", stat->name);
+        cJSON_AddNumberToObject(jstatus, "strength", stat->strength);
+        cJSON_AddNumberToObject(jstatus, "duration", stat->duration);
+        cJSON_AddNumberToObject(jstatus, "stacks", stat->stacks);
+        cJSON_AddItemToArray(jstatuses, jstatus);
+    }
+    cJSON_AddItemToObject(jplayer, "status_effects", jstatuses);
 
-	cJSON_AddItemToObject(jplayer, "equipment", jequip);
-	cJSON_AddItemToObject(root, "player", jplayer);
+    // --- Inventory ---
+    cJSON* jinv = cJSON_CreateArray();
+    if (!jinv) { fprintf(stderr, "[saving] Failed to create inventory array.\n"); goto cleanup; }
 
-	cJSON* jdifficulty = cJSON_CreateObject();
-	cJSON_AddNumberToObject(jdifficulty, "id", g_difficulty.diff)->valueint;
-	cJSON_AddItemToObject(root, "difficulty", jdifficulty);
+    for (int i = 0; i < player->inventory.totalItems; i++) {
+        Item* item = player->inventory.items[i];
+        if (!item) continue;
 
+        cJSON* jitem = cJSON_CreateObject();
+        if (!jitem) continue;
 
-	// Things coming from the level struct.
-	Level* level = &state->current_level;
-	cJSON* jlevel = cJSON_CreateObject();
-	if (!level || !jlevel) { fprintf(stderr, "[saving] err with level data.\n"); exit(1); }
-	
-	cJSON_AddNumberToObject(jlevel, "id", level->id)->valueint;
-	cJSON_AddStringToObject(jlevel, "name", level->name);
+        cJSON_AddNumberToObject(jitem, "id", item->id);
+        cJSON* jmeta = MD_ToJSON(&item->metadata);
+        if (!jmeta) continue;
+        cJSON_AddItemToObject(jitem, "metadata", jmeta);
+        cJSON_AddItemToArray(jinv, jitem);
+    }
+    cJSON_AddItemToObject(jplayer, "inventory", jinv);
 
-	// Entities
-	cJSON* jentities = cJSON_CreateArray();
-	for (int i = 0; i < level->entity_amount; i++) {
-		Entity* e = level->entities[i];
-		if (!e) { continue; }
+    // --- Equipment ---
+    cJSON* jequip = cJSON_CreateObject();
+    if (!jequip) { printf("[saving] Failed to create equipment object.\n"); goto cleanup; }
 
-		cJSON* je = cJSON_CreateObject();
-		cJSON_AddNumberToObject(je, "id", e->id);
-		cJSON_AddItemToObject(je, "metadata", MD_ToJSON(&e->metadata));
-		cJSON_AddItemToArray(jentities, je);
-	}
-	cJSON_AddItemToObject(jlevel, "entities", jentities);
+    SERIALIZE_SLOT_ARRAY(armor, player->equipment.armor, MAX_ARMOR_SLOTS);
+    SERIALIZE_SLOT_ARRAY(accessories, player->equipment.accessories, MAX_ACCESSORY_SLOTS);
+    SERIALIZE_SLOT_ARRAY(weapons, player->equipment.weapons, MAX_WEAPON_SLOTS);
+    cJSON_AddItemToObject(jplayer, "equipment", jequip);
 
+    // --- Difficulty ---
+    cJSON* jdifficulty = cJSON_CreateObject();
+    if (!jdifficulty) { printf("[saving] Failed to create difficulty object.\n"); goto cleanup; }
 
-	// Items
-	cJSON* jitems = cJSON_CreateArray();
-	for (int i = 0; i < level->item_amount; i++) {
-		Item* t = level->items[i];
-		if (!t) { continue; }
+    cJSON_AddNumberToObject(jdifficulty, "id", g_difficulty.diff);
 
-		cJSON* jt = cJSON_CreateObject();
-		cJSON_AddNumberToObject(jt, "id", t->id)->valueint;
-		cJSON_AddItemToObject(jt, "metdata", MD_ToJSON(&t->metadata));
-		cJSON_AddItemToArray(jitems, jt);
-	}
-	cJSON_AddItemToObject(jlevel, "items", jitems);
-	cJSON_AddItemToObject(root, "level", jlevel);
+    // --- Level ---
+    Level* level = state->current_level;
+    cJSON* jlevel = cJSON_CreateObject();
+    if (!jlevel) { printf("[saving] Failed to create level object.\n"); goto cleanup; }
 
-	char* json_string = cJSON_Print(root);
-	FILE* file = fopen(filepath, "w");
-	if (!file) {
-		fprintf(stderr, "[saving] Error creating save file.\n");
-		exit(1);
-	}
-	if (file) {
-		fprintf(file, "%s\n", json_string);
-		fclose(file);
-	}
+    cJSON_AddNumberToObject(jlevel, "id", level->id);
+    cJSON_AddStringToObject(jlevel, "name", level->name);
 
-	cJSON_Delete(root);
-	free(json_string);
+    // Entities
+    cJSON* jentities = cJSON_CreateArray();
+    if (!jentities) { printf("[saving] Failed to create entity array.\n"); goto cleanup; }
+
+    for (int i = 0; i < level->entity_amount; i++) {
+        Entity* e = level->entities[i];
+        if (!e) continue;
+
+        cJSON* je = cJSON_CreateObject();
+        if (!je) continue;
+
+        cJSON_AddNumberToObject(je, "id", e->id);
+        cJSON* jmeta = MD_ToJSON(&e->metadata);
+        if (!jmeta) continue;
+        cJSON_AddItemToObject(je, "metadata", jmeta);
+        cJSON_AddItemToArray(jentities, je);
+    }
+    cJSON_AddItemToObject(jlevel, "entities", jentities);
+
+    // Items
+    cJSON* jitems = cJSON_CreateArray();
+    if (!jitems) { printf("[saving] Failed to create level items array.\n"); goto cleanup; }
+
+    for (int i = 0; i < level->item_amount; i++) {
+        Item* t = level->items[i];
+        if (!t) continue;
+
+        cJSON* jt = cJSON_CreateObject();
+        if (!jt) continue;
+
+        cJSON_AddNumberToObject(jt, "id", t->id);
+        cJSON* jmeta = MD_ToJSON(&t->metadata);
+        if (!jmeta) continue;
+        cJSON_AddItemToObject(jt, "metadata", jmeta);
+        cJSON_AddItemToArray(jitems, jt);
+    }
+    cJSON_AddItemToObject(jlevel, "items", jitems);
+
+    // Add sections to root
+    cJSON_AddItemToObject(root, "player", jplayer);
+    cJSON_AddItemToObject(root, "difficulty", jdifficulty);
+    cJSON_AddItemToObject(root, "level", jlevel);
+
+    // Write to file
+    char* json_string = cJSON_Print(root);
+    if (!json_string) { printf("[saving] Failed to print JSON.\n"); goto cleanup; }
+
+    FILE* file = fopen(filepath, "w+");
+    if (!file) {
+        printf("[saving] Could not open file for writing: %s\n", filepath);
+        goto cleanup_json;
+    }
+
+    fprintf(file, "%s\n", json_string);
+    fclose(file);
+    success = true;
+
+cleanup_json:
+    free(json_string);
+cleanup:
+    cJSON_Delete(root);
+    if (!success) {
+        printf("[saving] Save failed.\n");
+        exit(1);
+    }
 }
 
-int GameState_Load_State(GameState* state, const char* path) {
-	FILE* file = fopen(path, "rb");
+int GameState_Load_State(GameState* state, const char* filepath) {
+	FILE* file = fopen(filepath, "rb");
 	if (!file) { return 0; }
 
 	fseek(file, 0, SEEK_END);
 	long len = ftell(file);
 	rewind(file);
-	
+
 	char* data = malloc(len + 1);
+	if (!data) { fclose(file); return 0; }
+
 	fread(data, 1, len, file);
 	data[len] = '\0';
 	fclose(file);
 
 	cJSON* root = cJSON_Parse(data);
 	free(data);
+	if (!root) return 0;
 
 	cJSON* jplayer = cJSON_GetObjectItem(root, "player");
-	if (!jplayer) { cJSON_Delete(root); return 0; }
-	Player* player = &state->player;
-	memset(player, 0, sizeof(Player));
+	if (!cJSON_IsObject(jplayer)) { cJSON_Delete(root); return 0; }
 
-	strncpy(player->name, cJSON_GetObjectItem(jplayer, "name")->valuestring, sizeof(player->name));
-	player->hp = cJSON_GetObjectItem(jplayer, "hp")->valueint;
-	player->dmg = cJSON_GetObjectItem(jplayer, "dmg")->valueint;
-	player->persuasion = cJSON_GetObjectItem(jplayer, "persuasion")->valueint;
-	player->stealth = cJSON_GetObjectItem(jplayer, "stealth")->valueint;
+	Player* player = state->player;
+	if (!player) { player = calloc(1, sizeof(Player)); state->player = player; }
+	else { memset(player, 0, sizeof(Player)); }
 
-	// Status effects
+	cJSON* val = NULL;
+
+	val = cJSON_GetObjectItem(jplayer, "name");
+	if (cJSON_IsString(val)) strncpy(player->name, val->valuestring, sizeof(player->name));
+
+	val = cJSON_GetObjectItem(jplayer, "hp");
+	if (cJSON_IsNumber(val)) player->hp = val->valueint;
+
+	val = cJSON_GetObjectItem(jplayer, "dmg");
+	if (cJSON_IsNumber(val)) player->dmg = val->valueint;
+
+	val = cJSON_GetObjectItem(jplayer, "persuasion");
+	if (cJSON_IsNumber(val)) player->persuasion = val->valueint;
+
+	val = cJSON_GetObjectItem(jplayer, "stealth");
+	if (cJSON_IsNumber(val)) player->stealth = val->valueint;
+
+	// --- Status Effects ---
 	cJSON* jstatuses = cJSON_GetObjectItem(jplayer, "status_effects");
-	if (jstatuses) {
+	if (cJSON_IsArray(jstatuses)) {
 		int count = cJSON_GetArraySize(jstatuses);
 		for (int i = 0; i < count && i < MAX_STATUS_EFFECTS; i++) {
 			cJSON* jstatus = cJSON_GetArrayItem(jstatuses, i);
+			if (!cJSON_IsObject(jstatus)) continue;
+
 			PlayerStatus* effect = &player->status_effects[i];
-			strncpy(effect->name, cJSON_GetObjectItem(jstatus, "name")->valuestring, sizeof(effect->name));
-			effect->strength = cJSON_GetObjectItem(jstatus, "strength")->valuedouble;
-			effect->duration = cJSON_GetObjectItem(jstatus, "duration")->valueint;
-			effect->stacks = cJSON_GetObjectItem(jstatus, "stacks")->valueint;
+
+			val = cJSON_GetObjectItem(jstatus, "name");
+			if (cJSON_IsString(val)) strncpy(effect->name, val->valuestring, sizeof(effect->name));
+
+			val = cJSON_GetObjectItem(jstatus, "strength");
+			if (cJSON_IsNumber(val)) effect->strength = val->valuedouble;
+
+			val = cJSON_GetObjectItem(jstatus, "duration");
+			if (cJSON_IsNumber(val)) effect->duration = val->valueint;
+
+			val = cJSON_GetObjectItem(jstatus, "stacks");
+			if (cJSON_IsNumber(val)) effect->stacks = val->valueint;
 		}
 		player->status_amount = count;
 	}
 
-	// Inventory
+	// --- Inventory ---
 	InventoryInit(&player->inventory);
 	cJSON* jinv = cJSON_GetObjectItem(jplayer, "inventory");
-	if (jinv) {
+	if (cJSON_IsArray(jinv)) {
 		int count = cJSON_GetArraySize(jinv);
 		for (int i = 0; i < count && i < INVENTORY_SIZE; i++) {
 			cJSON* jitem = cJSON_GetArrayItem(jinv, i);
-			int id = cJSON_GetObjectItem(jitem, "id")->valueint;
-			cJSON* jmeta = cJSON_GetObjectItem(jitem, "metadata");
+			if (!cJSON_IsObject(jitem)) continue;
+
+			val = cJSON_GetObjectItem(jitem, "id");
+			if (!cJSON_IsNumber(val)) continue;
+			int id = val->valueint;
 
 			const Item* base = ItemRegistry_GetByID(id);
-			if (!base) { continue; }
+			if (!base) continue;
 
 			Item* new_item = malloc(sizeof(Item));
+			if (!new_item) continue;
+
 			memcpy(new_item, base, sizeof(Item));
-			JSON_ToMD(jmeta, &new_item->metadata);
+
+			cJSON* jmeta = cJSON_GetObjectItem(jitem, "metadata");
+			if (cJSON_IsObject(jmeta)) {
+				JSON_ToMD(jmeta, &new_item->metadata);
+			}
+
 			Inventory_AddItem(&player->inventory, new_item);
 		}
 	}
 
-	// Equipment
+	// --- Equipment ---
 	cJSON* jequip = cJSON_GetObjectItem(jplayer, "equipment");
-	if (jequip) {
-
+	if (cJSON_IsObject(jequip)) {
 		DESERIALIZE_SLOT_ARRAY(armor, player->equipment.armor, MAX_ARMOR_SLOTS);
 		DESERIALIZE_SLOT_ARRAY(accessories, player->equipment.accessories, MAX_ACCESSORY_SLOTS);
 		DESERIALIZE_SLOT_ARRAY(weapons, player->equipment.weapons, MAX_WEAPON_SLOTS);
 	}
 
-	
-	// Deserializing level.
-
+	// --- Level ---
 	cJSON* jlevel = cJSON_GetObjectItem(root, "level");
-	if (!jlevel) { cJSON_Delete(root); return 0; }
-	Level* level = &state->current_level;
-	memset(level, 0, sizeof(Level));
+	if (!cJSON_IsObject(jlevel)) { cJSON_Delete(root); return 0; }
 
-	level->id = cJSON_GetObjectItem(jlevel, "id");
-	level->name = cJSON_GetObjectItem(jlevel, "name");
+	Level* level = state->current_level;
+	if (!level) {
+		level = calloc(1, sizeof(Level));
+		state->current_level = level;
+	}
+	else {
+		memset(level, 0, sizeof(Level));
+	}
 
-	// Entities
+	val = cJSON_GetObjectItem(jlevel, "id");
+	if (cJSON_IsNumber(val)) level->id = val->valueint;
+
+	val = cJSON_GetObjectItem(jlevel, "name");
+	if (cJSON_IsString(val)) strncpy(level->name, val->valuestring, sizeof(level->name));
+
+	// --- Entities ---
 	cJSON* jentities = cJSON_GetObjectItem(jlevel, "entities");
-	if (jentities) {
+	if (cJSON_IsArray(jentities)) {
 		int count = cJSON_GetArraySize(jentities);
 		for (int i = 0; i < count && i < MAX_ENTITIES_PER_LEVEL; i++) {
 			cJSON* je = cJSON_GetArrayItem(jentities, i);
-			if (!cJSON_IsObject(je)) { continue; }
+			if (!cJSON_IsObject(je)) continue;
 
-			int id = cJSON_GetObjectItem(je, "id")->valueint;
-			cJSON* jmeta = cJSON_GetObjectItem(je, "metadata");
+			val = cJSON_GetObjectItem(je, "id");
+			if (!cJSON_IsNumber(val)) continue;
+			int id = val->valueint;
 
 			Entity* base = EntityRegistry_CloneByID(id);
-			if (!base) { continue; }
+			if (!base) continue;
 
-			JSON_ToMD(jmeta, &base->metadata);
+			cJSON* jmeta = cJSON_GetObjectItem(je, "metadata");
+			if (cJSON_IsObject(jmeta)) {
+				JSON_ToMD(jmeta, &base->metadata);
+			}
+
 			level->entities[level->entity_amount++] = base;
 		}
 	}
 
+	// --- Difficulty ---
 	cJSON* jdifficulty = cJSON_GetObjectItem(root, "difficulty");
-	int id = cJSON_GetObjectItem(jdifficulty, "id");
-	if (id >= 0) { SetDifficulty(&g_difficulty, id); }
+	val = jdifficulty ? cJSON_GetObjectItem(jdifficulty, "id") : 0;
+	if (cJSON_IsNumber(val)) { SetDifficulty(&g_difficulty, val->valueint); }
 
 	state->current_level = level;
 	state->player = player;

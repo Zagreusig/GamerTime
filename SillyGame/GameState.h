@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
@@ -27,7 +27,7 @@ typedef struct Game_State_struct {
 
 extern GameState g_save_state;
 
-void GameState_Init(GameState* state);
+void GameState_Init();
 void GameState_Del(GameState* state);
 
 void GameState_Save_state(GameState* state, const char* filepath);
@@ -68,4 +68,4 @@ int GameState_Load_state(GameState* state, const char* filepath);
 			}\
 		} while (0)
 
-#endif
+#endif*/

@@ -42,6 +42,25 @@ void SetDifficulty(DConfig* config, Difficulty diff) {
 		config->npc_multiplier = 1.5;
 		config->jester_chance = 0.15;
 		break;
+	case DIFFICULTY_CUSTOM:
+		strcpy(config->read_diff, "Custom");
+		printf("Enter float values x.xx:\n");
+		printf("Enemy multiplier: ");
+		(void)scanf(" %0.2lf", &config->enemy_multiplier);
+		printf("\nPlayer multiplier: ");
+		(void)scanf(" %0.2lf", &config->player_multiplier);
+		printf("\nNPC multiplier: ");
+		(void)scanf(" %0.2lf", &config->npc_multiplier);
+		printf("\nJester: ");
+		(void)scanf(" %0.2lf", &config->jester_chance);
+		break;
+	case DIFFICULTY_CHALLENGE:
+		strcpy(config->read_diff, "Debug Challenge");
+		config->enemy_multiplier = 5.0;
+		config->player_multiplier = 0.25;
+		config->npc_multiplier = 9.0;
+		config->jester_chance = 0.4;
+		break;
 	}
 
 }

@@ -8,11 +8,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-// FIXME: Add Player_UpdateStat(Player* p, const char* stat);
+Player player = { '\0' };
 
-void Player_Init(Player* p) {
+void Player_Init(Player* p, const char* name) {
 	p->id = 0;
-	p->name = "Player";
+	if (!name) {
+		p->name = "Unnamed player";
+	}
+	else {
+		p->name = name;
+	}
 	p->hp = 100;
 	p->dmg = 5;
 	p->persuasion = 0;

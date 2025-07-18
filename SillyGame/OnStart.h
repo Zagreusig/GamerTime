@@ -4,6 +4,7 @@
 
 #include "Level.h"
 
-void OnStart(Player* p, Item* item, Entity* ent, Level* level);
+void OnStart();
+void NewGame();
 
 #endif

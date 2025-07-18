@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cJSON.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="Difficulty.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GameState.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="json_loader.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="MetDat.h" />
+    <ClInclude Include="NewGameState.h" />
     <ClInclude Include="OnStart.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="StatusEffects.h" />

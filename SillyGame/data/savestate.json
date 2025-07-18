@@ -1,0 +1,52 @@
+{
+	"player":	{
+		"name":	"Default Player",
+		"hp":	100,
+		"dmg":	5,
+		"persuasion":	0,
+		"status_effects":	[],
+		"inventory":	[],
+		"equipment":	{
+			"armor":	[null, null, null, null],
+			"accessories":	[null, null],
+			"weapons":	[null, null]
+		}
+	},
+	"difficulty":	{
+		"id":	0
+	},
+	"level":	{
+		"id":	1,
+		"name":	"Default Level",
+		"entities":	[{
+				"id":	1,
+				"metadata":	{
+					"Name":	"Test Entity",
+					"Rarity":	"Legendary",
+					"BaseHP":	100,
+					"BaseDMG":	10000,
+					"CurrentHP":	100,
+					"ActualDMG":	10000,
+					"Opinion":	-100,
+					"PrimaryStage":	1,
+					"SecondaryStage":	2,
+					"SpawnWeight":	3.5
+				}
+			}, {
+				"id":	2,
+				"metadata":	{
+					"Name":	"Test Ent 2",
+					"Rarity":	"Common",
+					"BaseHP":	5,
+					"BaseDMG":	100,
+					"CurrentHP":	5,
+					"ActualDMG":	100,
+					"Opinion":	50,
+					"PrimaryStage":	0,
+					"SecondaryStage":	0,
+					"SpawnWeight":	1.5
+				}
+			}],
+		"items":	[]
+	}
+}

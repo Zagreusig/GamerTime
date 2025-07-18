@@ -30,7 +30,7 @@ typedef struct Player_Status_struct {
 
 typedef struct Player_struct {
 	const char* name;
-	
+
 	int id;
 	int hp;
 	int dmg;
@@ -46,8 +46,9 @@ typedef struct Player_struct {
 
 }Player;
 
+extern Player player;
 
-void Player_Init(Player* p);
+void Player_Init(Player* p, const char* name);
 void Player_AddStatus(Player* p, const char* effect, double strength, int duration);
 int Player_HasStatus(Player* p, const char* name);
 int Player_RemoveStatus(Player* p, const char* name);

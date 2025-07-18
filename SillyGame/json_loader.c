@@ -12,16 +12,46 @@
 
 char* ReadFile(const char* path) {
 	FILE* file = fopen(path, "rb");
-	if (!file) { return NULL; }
+	if (!file) {
+		fprintf(stderr, "Failed to open file: %s\n", path);
+		return NULL;
+	}
 
-	fseek(file, 0, SEEK_END);
+	// Get file length
+	if (fseek(file, 0, SEEK_END) != 0) {
+		fclose(file);
+		fprintf(stderr, "Failed to seek to end of file: %s\n", path);
+		return NULL;
+	}
+
 	long len = ftell(file);
+	if (len < 0) {
+		fclose(file);
+		fprintf(stderr, "Failed to get file length: %s\n", path);
+		return NULL;
+	}
+
 	rewind(file);
 
+	// Allocate buffer with +1 for null terminator
 	char* data = (char*)malloc(len + 1);
-	fread(data, 1, len, file);
-	data[len] = '\0';
+	if (!data) {
+		fclose(file);
+		fprintf(stderr, "Memory allocation failed for file: %s\n", path);
+		return NULL;
+	}
+
+	// Read file contents
+	size_t read = fread(data, 1, len, file);
 	fclose(file);
+
+	if (read != (size_t)len) {
+		fprintf(stderr, "Failed to read full file: %s\n", path);
+		free(data);
+		return NULL;
+	}
+
+	data[len] = '\0'; // Null-terminate for safe string usage
 	return data;
 }
 
@@ -86,9 +116,14 @@ int LoadEntitiesJSON(const char* path, Entity* entities, int max_entities) {
 
 // Converts our MetaData tags -> cJSON objects [:
 cJSON* MD_ToJSON(const MD* md) {
+	if (!md) return NULL;
+
 	cJSON* obj = cJSON_CreateObject();
+	if (!obj) return NULL;
+
 	for (int i = 0; i < md->tag_amt; i++) {
 		MD_Tag* tag = &md->tags[i];
+		if (!tag->key) continue;
 
 		switch (tag->type) {
 		case TAG_INT:
@@ -98,7 +133,8 @@ cJSON* MD_ToJSON(const MD* md) {
 			cJSON_AddNumberToObject(obj, tag->key, tag->double_val);
 			break;
 		case TAG_STRING:
-			cJSON_AddStringToObject(obj, tag->key, tag->string_val);
+			if (tag->string_val)
+				cJSON_AddStringToObject(obj, tag->key, tag->string_val);
 			break;
 		default:
 			break;
@@ -107,28 +143,38 @@ cJSON* MD_ToJSON(const MD* md) {
 	return obj;
 }
 
+
 // Converting JSON -> MD tags
 void JSON_ToMD(cJSON* json, MD* md) {
+	if (!json || !md) return;  // null safety
+
 	cJSON* item = NULL;
 	cJSON_ArrayForEach(item, json) {
 		const char* key = item->string;
-		if (!key) { continue; }
+		if (!key) continue;
 
 		if (cJSON_IsNumber(item)) {
-			// Attempt to preserve decimal precision
 			double num = item->valuedouble;
+
+			// Attempt to preserve decimal precision
 			if ((double)((int)num) == num) {
-				MD_SetInt(md, key, num);
+				MD_SetInt(md, key, (int)num);  // ensure correct cast
 			}
 			else {
 				MD_SetDouble(md, key, num);
 			}
 		}
 		else if (cJSON_IsString(item)) {
-			MD_SetString(md, key, item->valuestring);
+			if (item->valuestring) {
+				MD_SetString(md, key, item->valuestring);
+			}
+		}
+		else {
+			fprintf(stderr, "[JSON_ToMD] Unsupported type for key: %s\n", key);
 		}
 	}
 }
+
 
 int GameState_Load_state(GameState* state, const char* path) {
 	char* data = ReadFile(path);
@@ -184,22 +230,6 @@ int GameState_Load_state(GameState* state, const char* path) {
 	// Equipment
 	cJSON* jequip = cJSON_GetObjectItem(jplayer, "equipment");
 
-#define LOAD_EQUIP_SLOT(name, arr, count) \
-        do { \
-            cJSON* jarr = cJSON_GetObjectItem(jequip, #name); \
-            for (int i = 0; i < count && i < cJSON_GetArraySize(jarr); ++i) { \
-                cJSON* eq = cJSON_GetArrayItem(jarr, i); \
-                if (cJSON_IsNull(eq)) { arr[i] = NULL; continue; } \
-                int id = cJSON_GetObjectItem(eq, "id")->valueint; \
-                cJSON* jmeta = cJSON_GetObjectItem(eq, "metadata"); \
-                Item* it = malloc(sizeof(Item)); \
-                if (!it) continue; \
-				Item_Create_FromMD(it, id, &jmeta); \
-                JSON_ToMD(jmeta, &it->metadata); \
-                arr[i] = it; \
-            } \
-        } while (0)
-
 	LOAD_EQUIP_SLOT(armor, p->equipment.armor, MAX_ARMOR_SLOTS);
 	LOAD_EQUIP_SLOT(accessories, p->equipment.accessories, MAX_ACCESSORY_SLOTS);
 	LOAD_EQUIP_SLOT(weapons, p->equipment.weapons, MAX_WEAPON_SLOTS);
@@ -211,11 +241,10 @@ int GameState_Load_state(GameState* state, const char* path) {
 	return 1;
 }
 
-void GameState_Init(GameState* state) {
-	memset(state, 0, sizeof(GameState));
-	if (!&state->player) {
-		Player_Init(&state->player);
-	}
+void GameState_Init() {
+	memset(&g_save_state, 0, sizeof(GameState));
+	Level_Init(g_save_state.current_level, 0, "Default");
+
 }
 
 void GameState_Del(GameState* state) {

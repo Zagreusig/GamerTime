@@ -23,9 +23,6 @@
     <ClCompile Include="StatusEffect.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SaveGame.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Player.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Difficulty.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,6 +98,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StatusEffects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NewGameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
