@@ -2,7 +2,7 @@
 
 /*
 *	
-*  Zagreus Silvey 06/2025
+*  Zagreus Silvey 07/2025
 *  This file serves to create a "shadow" of the game to be serialized for saves.
 *  Calls on the difficulty, item and entity registries to do so. 
 *  Utilizing cJSON to store into a JSON file.
@@ -24,19 +24,70 @@ extern EntityRegistry g_entity_registry;
 extern DConfig g_difficulty;
 
 GameState g_save_state = { NULL };
+char* savepath = { NULL };
 
-
-void GameState_Init() {
-	memset(&g_save_state, 0, sizeof(GameState));
-	Level_Init(g_save_state.current_level, 0, "Default");
+void SetSavePath(const char* path, int num) {
+	if (path != NULL) { savepath = path; return; }
+	else { savepath = FilePathList(num); }
 
 }
 
-void GameState_Del(GameState* state) {
-	free(state->player);
-	free(state->current_level);
-	free(state);
+char* FilePathList(int num) {
+	switch (num) {
+	case 1:
+		return "data/savefile1.json";
+		break;
+	case 2:
+		return "data/savefile2.json";
+		break;
+	case 3:
+		return "data/savefile3.json";
+		break;
+	case 4:
+		return "data/savefile4.json";
+		break;
+	default:
+		return "data/savefile1.json";
+		break;
+	}
 }
+
+int SaveFileCheck(int slot) {
+	FILE* f = NULL;
+	
+	if (!slot) {
+		for (int i = 1; i < 5; i++) {
+			f = fopen(FilePathList(i), "rb");
+			if (f) { fclose(f); return 1; }
+			else { f = NULL; }
+		}
+	}
+	else {
+		f = fopen(FilePathList(slot), "rb");
+		if (f) { return 1; }
+	}
+	return 0;
+}
+
+int SaveFileCountCheck() {
+	int success_counter = 0;
+	FILE* save = fopen("data/savefile1.json", "rb");
+	if (save) { success_counter++; fclose(save); save = NULL; }
+
+	save = fopen("data/savefile2.json", "rb");
+	if (save) { success_counter++; fclose(save); save = NULL; }
+
+	save = fopen("data/savefile3.json", "rb");
+	if (save) { success_counter++; fclose(save); save = NULL; }
+
+	save = fopen("data/savefile4.json", "rb");
+	if (save) { success_counter++; fclose(save); save = NULL; }
+
+	free(save);
+	return success_counter;
+}
+
+int SaveFileDelete(const char* path) { return remove(path); }
 
 void GameState_Save_state(GameState* state, const char* filepath) {
     if (!state || !state->player || !state->current_level) {
@@ -174,6 +225,7 @@ void GameState_Save_state(GameState* state, const char* filepath) {
     fprintf(file, "%s\n", json_string);
     fclose(file);
     success = true;
+	printf("[ Saving ] Successfully saved the game!\n");
 
 cleanup_json:
     free(json_string);
@@ -349,6 +401,31 @@ int GameState_Load_State(GameState* state, const char* filepath) {
 			}
 
 			level->entities[level->entity_amount++] = base;
+		}
+		level->entity_amount = count;
+	}
+
+	// --- Items ---
+	cJSON* jitems = cJSON_CreateArray();
+	if (cJSON_IsArray(jitems)) {
+		int count = cJSON_GetArraySize(jitems);
+		for (int i = 0; i < count && i < MAX_ITEMS_IN_LEVEL; i++){
+			cJSON* ji = cJSON_GetArrayItem(jitems, i);
+			if (!cJSON_IsObject(ji)) { continue; }
+
+			val = cJSON_GetObjectItem(ji, "id");
+			if (!cJSON_IsNumber(val)) { continue; }
+			int id = val->valueint;
+			
+			Item* base = ItemRegistry_CloneByID(id);
+			if (!base) { continue; }
+
+			cJSON* jmeta = cJSON_GetObjectItem(ji, "metadata");
+			if (cJSON_IsObject(jmeta)) {
+				JSON_ToMD(jmeta, &base->metadata);
+			}
+
+			level->items[level->item_amount++] = base;
 		}
 	}
 

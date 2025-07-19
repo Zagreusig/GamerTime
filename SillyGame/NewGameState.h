@@ -26,13 +26,13 @@ typedef struct Game_state_struct {
 
 extern GameState g_save_state;
 
-void GameState_Init();
-//void GameState_Del();
-
 void GameState_Save_state(GameState* state, const char* filepath);
 int GameState_Load_State(GameState* state, const char* filepath);
-void GameState_Init();
-void GameState_Del(GameState* state);
+void SetSavePath(const char* path, int num);
+int SaveFileCheck(int slot);
+char* FilePathList(int num);
+int SaveFileCountCheck();
+int SaveFileDelete(const char* path);
 
 #define SERIALIZE_SLOT_ARRAY(name, arr, count)\
 do { \

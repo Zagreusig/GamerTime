@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+// FIXME: Change so that the level info is referenced from preset JSONS
 void Level_Init(Level* level, int id, const char* name) {
     if (id && name) {
         level->id = id;
@@ -40,8 +42,6 @@ void Level_Init(Level* level, int id, const char* name) {
 
 
     // FIXME: Add in lookup by level id for monsters and init them here.
-    /*for (int i = 0; i < MAX_ENTITIES_PER_LEVEL; i++) { level->entities[i] = NULL; }
-    for (int i = 0; i < MAX_ITEMS_IN_LEVEL; i++) { level->items[i] = NULL; }*/
 }
 
 void Level_AddEntityIfMatch(Level* level, Entity* e) {
@@ -55,6 +55,14 @@ void Level_AddEntityIfMatch(Level* level, Entity* e) {
             }
         }
     }
+}
+
+void Level_PrintLevel(const Level* level) {
+    printf("\n[ Level ] ID: %d", level->id);
+    printf("\n[ Level ] Name: %s", level->name);
+    printf("\n[ Level ] Ent count: %d", level->entity_amount);
+    printf("\n[ Level ] Item count: %d", level->item_amount);
+    Level_PrintEntities(&level);
 }
 
 void Level_PrintEntities(const Level* level) {

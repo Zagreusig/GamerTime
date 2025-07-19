@@ -6,5 +6,6 @@
 
 void OnStart();
 void NewGame();
+void LoadGame();
 
 #endif

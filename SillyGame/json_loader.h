@@ -14,7 +14,6 @@ int LoadEntitiesJSON(const char* path, Entity* entities, int max_entities);
 cJSON* MD_ToJSON(const MD* meta);
 void JSON_ToMD(cJSON* json, MD* meta);
 
-int GameState_Load_state(GameState* state, const char* path);
 
 #define LOAD_EQUIP_SLOT(name, arr, count) \
         do { \

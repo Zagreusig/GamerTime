@@ -23,6 +23,7 @@ typedef struct Level_struct {
 void Level_Init(Level* level, int id, const char* name);
 void Level_AddEntityIfMatch(Level* level, Entity* e);
 void Level_PrintEntities(const Level* stage);
+void Level_PrintLevel(const Level* level);
 void Level_AddItemIfMatch(Level* level, Item* item);
 Entity* Level_GrabRandEntity(Level* level);
 
