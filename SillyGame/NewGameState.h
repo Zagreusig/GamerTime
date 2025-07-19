@@ -31,6 +31,9 @@ void GameState_Init();
 
 void GameState_Save_state(GameState* state, const char* filepath);
 int GameState_Load_State(GameState* state, const char* filepath);
+void GameState_Init();
+void GameState_Del(GameState* state);
+
 #define SERIALIZE_SLOT_ARRAY(name, arr, count)\
 do { \
     cJSON* j##name = cJSON_CreateArray(); \

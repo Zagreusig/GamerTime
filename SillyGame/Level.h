@@ -11,9 +11,9 @@
 #define MAX_ENTITIES_PER_LEVEL 32
 #define MAX_ITEMS_IN_LEVEL 64
 
-typedef struct Level_struct{
+typedef struct Level_struct {
     int id;
-    const char* name;
+    char name[32];
     Entity* entities[MAX_ENTITIES_PER_LEVEL];
     int entity_amount;
     Item* items[MAX_ITEMS_IN_LEVEL];

@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Difficulty.h"
 #include "Level.h"
 #include <stdio.h>
@@ -7,11 +9,11 @@
 void Level_Init(Level* level, int id, const char* name) {
     if (id && name) {
         level->id = id;
-        level->name = name;
+        strcpy(level->name, name);
     }
     else {
         level->id = 0;
-        level->name = "Name";
+        strcpy(level->name, "Default Name");
     }
     level->entity_amount = 0;
     level->item_amount = 0;
@@ -59,9 +61,17 @@ void Level_PrintEntities(const Level* level) {
     printf("Level %d: %s\n", level->id, level->name);
     printf("Entities in this level:\n");
     for (int i = 0; i < level->entity_amount; ++i) {
+        PrintEntity(level->entities[i]);
+    }
+}
+
+void Level_PrintItems(const Level* level) {
+    printf("Level %d: %s\n", level->id, level->name);
+    printf("Items in this level:\n");
+    for (int i = 0; i < level->item_amount; ++i) {
         char name[64];
         MD_GetString(&level->entities[i]->metadata, "Name", name, sizeof(name));
-        printf("  - [%d] %s\n", level->entities[i]->id, name);
+        printf(" - [%d] %s\n", level->items[i]->id, name);
     }
 }
 

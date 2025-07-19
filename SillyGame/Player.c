@@ -13,10 +13,10 @@ Player player = { '\0' };
 void Player_Init(Player* p, const char* name) {
 	p->id = 0;
 	if (!name) {
-		p->name = "Unnamed player";
+		strcpy(p->name, "Unnamed player");
 	}
 	else {
-		p->name = name;
+		strcpy(p->name, name);
 	}
 	p->hp = 100;
 	p->dmg = 5;
@@ -83,7 +83,7 @@ void Player_AddStatus(Player* p, const char* effect, double strength, int durati
 	if (p->status_amount >= MAX_STATUS_EFFECTS) { return; }
 
 	PlayerStatus* new_status = &p->status_effects[p->status_amount++];
-	new_status->name = _strdup(effect);
+	strcpy(new_status->name, _strdup(effect));
 	new_status->strength = strength;
 	new_status->duration = duration;
 	new_status->stacks = stat->stackable ? 1 : 0;
@@ -144,13 +144,13 @@ void Player_ResolveStatusEffects(Player* p, const DConfig* config) {
 }
 
 void PrintPlayer(const Player* p) {
-	printf("Player [%d]: %s\n", p->id, p->name);
-	printf("HP: %d\n", p->hp);
-	printf("DMG: %d\n", p->dmg);
-	printf("Persuasion: %d\n", p->persuasion);
-	printf("Stealth: %d\n", p->stealth);
+	printf("\n[ Player ] Player [%d]: %s\n", p->id, p->name);
+	printf("[ Player ] HP: %d\n", p->hp);
+	printf("[ Player ] DMG: %d\n", p->dmg);
+	printf("[ Player ] Persuasion: %d\n", p->persuasion);
+	printf("[ Player ] Stealth: %d\n", p->stealth);
 
-	printf("\nStatus Effects : \n");
+	printf("\n[ Player ] Status Effects : \n");
 	if (p->status_amount == 0) {
 		printf("None.\n");
 	}

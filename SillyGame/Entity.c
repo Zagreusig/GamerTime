@@ -24,7 +24,7 @@ void CreateEntity(Entity* e, int id, const char* name, int base_hp, int base_dmg
 
     // Will change stats
     MD_SetInt(&e->metadata, "CurrentHP", base_hp);
-    MD_SetInt(&e->metadata, "ActualDMG", base_dmg);
+    MD_SetInt(&e->metadata, "CurrentDMG", base_dmg);
     MD_SetInt(&e->metadata, "Opinion", opinion);
 
     // Stage data
@@ -63,12 +63,12 @@ void PrintEntity(const Entity* e) {
     MD_GetInt((MD*)&e->metadata, "CurrentDMG", &curr_dmg);
     MD_GetInt((MD*)&e->metadata, "Opinion", &opinion);
 
-    printf("Entity ID: %d\n", e->id);
+    printf("\nEntity ID: %d\n", e->id);
     printf("Name: %s\n", name);
     printf("Rarity: %s\n", rarity);
     printf("Base Stats - HP: %d, DMG: %d\n", base_hp, base_dmg);
     printf("Current Stats - HP: %d, DMG: %d\n", curr_hp, curr_dmg);
-    printf("Opinion: %d\n", opinion);
+    printf("Opinion: %d\n\n", opinion);
 }
 
 void EntityRegistry_LoadFromJSON(const char* path) {

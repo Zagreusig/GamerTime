@@ -29,11 +29,13 @@ int main(void) {
     if (g_save_state.current_level) { printf("[ State ] Verified Level data.\n"); }
     if (g_save_state.player) { printf("[ State ] Verified Player data.\n"); }
 
-    PrintPlayer(&g_save_state.player);
+    PrintPlayer(g_save_state.player);
     printf("\n[ Level ] ID: %d", g_save_state.current_level->id);
     printf("\n[ Level ] Name: %s", g_save_state.current_level->name);
     printf("\n[ Level ] Ent count: %d", g_save_state.current_level->entity_amount);
     printf("\n[ Level ] Item count: %d", g_save_state.current_level->item_amount);
+
+    Level_PrintEntities(g_save_state.current_level);
 
     printf("\n All Tests passed.\n");
 

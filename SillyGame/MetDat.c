@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "MetDat.h"
+#include <stdio.h>
 #include <string.h>
 
 void MD_SetInt(MD* md, const char* key, int value) {
@@ -79,4 +80,65 @@ int MD_GetDouble(MD* md, const char* key, double* out_val) {
         }
     }
     return 0;
+}
+
+
+// Converts our MetaData tags -> cJSON objects [:
+cJSON* MD_ToJSON(const MD* md) {
+    if (!md) return NULL;
+
+    cJSON* obj = cJSON_CreateObject();
+    if (!obj) return NULL;
+
+    for (int i = 0; i < md->tag_amt; i++) {
+        MD_Tag* tag = &md->tags[i];
+        if (!tag->key) continue;
+
+        switch (tag->type) {
+        case TAG_INT:
+            cJSON_AddNumberToObject(obj, tag->key, tag->int_val);
+            break;
+        case TAG_DOUBLE:
+            cJSON_AddNumberToObject(obj, tag->key, tag->double_val);
+            break;
+        case TAG_STRING:
+            if (tag->string_val)
+                cJSON_AddStringToObject(obj, tag->key, tag->string_val);
+            break;
+        default:
+            break;
+        }
+    }
+    return obj;
+}
+
+// Converting JSON -> MD tags
+void JSON_ToMD(cJSON* json, MD* md) {
+    if (!json || !md) return;  // null safety
+
+    cJSON* item = NULL;
+    cJSON_ArrayForEach(item, json) {
+        const char* key = item->string;
+        if (!key) continue;
+
+        if (cJSON_IsNumber(item)) {
+            double num = item->valuedouble;
+
+            // Attempt to preserve decimal precision
+            if ((double)((int)num) == num) {
+                MD_SetInt(md, key, (int)num);  // ensure correct cast
+            }
+            else {
+                MD_SetDouble(md, key, num);
+            }
+        }
+        else if (cJSON_IsString(item)) {
+            if (item->valuestring) {
+                MD_SetString(md, key, item->valuestring);
+            }
+        }
+        else {
+            printf("[ JSON_ToMD ] Unsupported type for key: %s\n", key);
+        }
+    }
 }

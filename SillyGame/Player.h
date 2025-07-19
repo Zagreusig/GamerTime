@@ -22,14 +22,14 @@ typedef struct Equipment_struct {
 }Equipment;
 
 typedef struct Player_Status_struct {
-	char* name;
+	char name [32];
 	double strength;
 	int duration;
 	int stacks;
 } PlayerStatus;
 
 typedef struct Player_struct {
-	const char* name;
+	char name[32];
 
 	int id;
 	int hp;

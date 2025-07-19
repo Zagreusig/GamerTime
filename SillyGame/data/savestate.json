@@ -1,9 +1,10 @@
 {
 	"player":	{
-		"name":	"Default Player",
+		"name":	"Unnamed player",
 		"hp":	100,
 		"dmg":	5,
 		"persuasion":	0,
+		"sealth":	0,
 		"status_effects":	[],
 		"inventory":	[],
 		"equipment":	{
@@ -16,8 +17,8 @@
 		"id":	0
 	},
 	"level":	{
-		"id":	1,
-		"name":	"Default Level",
+		"id":	0,
+		"name":	"Default Name",
 		"entities":	[{
 				"id":	1,
 				"metadata":	{
@@ -26,7 +27,7 @@
 					"BaseHP":	100,
 					"BaseDMG":	10000,
 					"CurrentHP":	100,
-					"ActualDMG":	10000,
+					"CurrentDMG":	10000,
 					"Opinion":	-100,
 					"PrimaryStage":	1,
 					"SecondaryStage":	2,
@@ -40,7 +41,7 @@
 					"BaseHP":	5,
 					"BaseDMG":	100,
 					"CurrentHP":	5,
-					"ActualDMG":	100,
+					"CurrentDMG":	100,
 					"Opinion":	50,
 					"PrimaryStage":	0,
 					"SecondaryStage":	0,

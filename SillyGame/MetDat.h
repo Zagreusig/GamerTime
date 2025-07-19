@@ -35,5 +35,8 @@ int MD_SetDouble(MD* md, const char* key, double val);
 int MD_GetDouble(MD* md, const char* key, double* out_val);
 int MD_GetInt(MD* md, const char* key, int* out);
 int MD_GetString(MD* md, const char* key, char* out, int max_len);
+cJSON* MD_ToJSON(const MD* meta);
+void JSON_ToMD(cJSON* json, MD* meta);
+
 
 #endif
